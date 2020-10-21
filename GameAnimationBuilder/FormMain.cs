@@ -333,6 +333,12 @@ namespace GameAnimationBuilder
                 button_Tricks_Click(null, null);
                 return true;
             }
+
+            if (keyData == Keys.F7)
+            {
+                button_Export_Click(null, null);
+                return true;
+            }
             #endregion
 
             if(IsSuggestionsVisible)
