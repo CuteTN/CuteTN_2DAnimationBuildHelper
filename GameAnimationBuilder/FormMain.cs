@@ -702,7 +702,5 @@ namespace GameAnimationBuilder
             sw.Dispose();
         }
         #endregion
-
- 
     }
 }
