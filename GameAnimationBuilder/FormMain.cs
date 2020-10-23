@@ -35,6 +35,9 @@ namespace GameAnimationBuilder
         {
             textBox_Code.AcceptsTab = true;
 
+            // working directory
+            textBox_WorkingDir.Text = Application.StartupPath;
+
             // timer
             timer = new Timer();
             timer.Interval = 1;
@@ -93,7 +96,8 @@ namespace GameAnimationBuilder
         {
             var words = new List<string>(scope.Split(Utils.WordSeperators, StringSplitOptions.RemoveEmptyEntries));
             string error = "";
-            var tempObj = AnimatingObject.Interpret(words, out error);
+            var tempObj = AnimatingObject.InterpretScope(words, out error);
+
 
             if (error == "" || error == null)
             {
@@ -150,6 +154,8 @@ namespace GameAnimationBuilder
 
             if(dlgRes == DialogResult.OK)
             {
+                button_Clear_Click(null, null);
+
                 StreamReader sw = new StreamReader(dlg.FileName);
                 Code = sw.ReadToEnd();
                 sw.Close();
@@ -227,6 +233,17 @@ namespace GameAnimationBuilder
             }
         }
 
+        private void button_ChangeWorkingDir_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog dlg = new FolderBrowserDialog();
+            var dlgRes = dlg.ShowDialog();
+
+            if (dlgRes == DialogResult.OK)
+            {
+                textBox_WorkingDir.Text = dlg.SelectedPath;
+            }
+        }
+
         private void button_Tricks_Click(object sender, EventArgs e)
         {
             string tricks = "";
@@ -284,6 +301,7 @@ namespace GameAnimationBuilder
 
                 // only works when current context is file path
                 PeekImagePath();
+                PeekTextPath();
 
                 // only works when current context is id
                 SetIdPrefix(); 
@@ -347,7 +365,7 @@ namespace GameAnimationBuilder
                 if(temp)
                     return true;
             }
-
+ 
             if(keyData == (Keys.D6 | Keys.Shift))
             {
                 UpperCaseCurrentWord();
@@ -585,22 +603,37 @@ namespace GameAnimationBuilder
         /// <summary>
         /// Auto complete with context = FileName
         /// </summary>
-        private void PeekImagePath()
+        private void PeekPath(string filter)
         {
-            string tag; int order;
-            var context = GetCurrentContext(out tag, out order);
-            if (context != ContextType.FileName)
-                return;
-
             OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
+            dlg.Filter = filter;
             var res = dlg.ShowDialog();
 
             if(res == DialogResult.OK)
             {
-                string encodedFilePath = "\"" + dlg.FileName.Replace(" ", Utils.AlternativeSpaceInPath) + "\"";
-                Utils.ReplaceCurrentTextBoxWord(textBox_Code, encodedFilePath);
+                string encodedPath = Utils.EncodePath(dlg.FileName);
+                Utils.ReplaceCurrentTextBoxWord(textBox_Code, encodedPath);
             }
+        }
+
+        private void PeekImagePath()
+        {
+            string tag; int order;
+            var context = GetCurrentContext(out tag, out order);
+            if (context != ContextType.ImageFilePath)
+                return;
+
+            PeekPath("Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png");
+        }
+
+        private void PeekTextPath()
+        {
+            string tag; int order;
+            var context = GetCurrentContext(out tag, out order);
+            if (context != ContextType.TextFilePath)
+                return;
+
+            PeekPath("Text files(*.txt)|*.txt|All files (*.*)|*.*");
         }
 
         /// <summary>
@@ -682,11 +715,6 @@ namespace GameAnimationBuilder
         }
         // Auto view logic is in the function Timer_Tick
 
-        private void checkBox_AutoView_CheckedChanged(object sender, EventArgs e)
-        {
-            if(AutoView)
-                MessageBox.Show(null, "Really buggy, I suggest turning Auto View off if not necessary :)", "Caution", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        }
         #endregion
 
         #region Backup Code
@@ -700,6 +728,14 @@ namespace GameAnimationBuilder
             sw.WriteLine(Code);
             sw.Close();
             sw.Dispose();
+        }
+
+        #endregion
+
+        #region Working Dir
+        private void textBox_WorkingDir_TextChanged(object sender, EventArgs e)
+        {
+            Utils.WorkingDir = textBox_WorkingDir.Text;
         }
         #endregion
     }

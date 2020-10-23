@@ -20,7 +20,7 @@ namespace GameAnimationBuilder
             -GetPreviewBitmap
         */
 
-        public string Filepath = "";
+        public string EncodedFilePath = "";
         public Bitmap Bitmap;
         public int RowCount, ColCount;
 
@@ -33,7 +33,7 @@ namespace GameAnimationBuilder
                 return ContextType.Id;
 
             if (order == 2)
-                return ContextType.FileName;
+                return ContextType.ImageFilePath;
 
             if ((order == 3) || (order == 4))
                 return ContextType.Int;
@@ -79,16 +79,21 @@ namespace GameAnimationBuilder
                 return $"Please follow this snippet: \n{GetSnippet()}";
 
             StringId = codeWords[1];
+            string filePath = "";
             
             try
             { 
-                // CuteTN Sorry: Dirty birdy woohoo
-                Filepath = codeWords[2].Substring(1, codeWords[2].Length - 2).Replace(Utils.AlternativeSpaceInPath, " ");
-                Bitmap = new Bitmap(Filepath);
+                if(!Utils.IsValidEncodedFilePath(codeWords[2]))
+                    return $"Invalid filepath {codeWords[2]}";
+
+                EncodedFilePath = codeWords[2];
+                
+                filePath = Utils.DecodePathToWork(EncodedFilePath);
+                Bitmap = new Bitmap(filePath);
             }
             catch(Exception e)
             {
-                return $"File path {Filepath} is not found or not an image file.\n"
+                return $"File path {filePath} is not found or not an image file.\n"
                     +  $"Hint: in case your file path has whitespace in it, replace it with {Utils.AlternativeSpaceInPath}\n";
 
                 // return $"{Utils.UnknownErrorMsg}: {e.Message}";

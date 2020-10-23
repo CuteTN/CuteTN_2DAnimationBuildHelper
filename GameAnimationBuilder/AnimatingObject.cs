@@ -14,7 +14,8 @@ namespace GameAnimationBuilder
         Id,
         Int,
         Bool,
-        FileName,
+        ImageFilePath,
+        TextFilePath,
         Texture,
         Sprite,
         Animation,
@@ -39,7 +40,7 @@ namespace GameAnimationBuilder
         /// [ Factory method ]
         /// </summary>
         /// <returns></returns>
-        static public AnimatingObject Interpret(List<string> codeWords, out string errorReport)
+        static public AnimatingObject InterpretScope(List<string> codeWords, out string errorReport)
         {
             AnimatingObject result = null;
             errorReport = "";
@@ -60,6 +61,40 @@ namespace GameAnimationBuilder
             return result;
         }
 
+        static public AnimatingObject InterpretScope(string scope, out string errorReport)
+        {
+            var words = new List<string>(scope.Split(Utils.WordSeperators, StringSplitOptions.RemoveEmptyEntries));
+            var tempObj = AnimatingObject.InterpretScope(words, out errorReport);
+
+            return tempObj;
+        }
+
+        /// <summary>
+        /// Warning, this can only add independent data objects because it doesn't add object to lib automatically!
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="errorReport"></param>
+        /// <returns></returns>
+        static public List<AnimatingObject> Interpret(string code, out string errorReport)
+        {
+            var scopes = code.Split(Utils.EndScopeChar);
+            errorReport = "";
+
+            List<AnimatingObject> result = new List<AnimatingObject>();
+
+            foreach (var sc in scopes)
+            {
+                string newError;
+                var tempObj = InterpretScope(sc, out newError);
+
+                errorReport += newError + "\n";
+                if(tempObj != null)
+                    result.Add(tempObj);
+            }
+
+            return result;
+        }
+
         static public AnimatingObject CreateTypeFromTag(string tag)
         {
             switch (tag.ToUpper())
@@ -72,6 +107,8 @@ namespace GameAnimationBuilder
                     return new ObjectAnimations();
                 case "COLLISION_BOX_GROUP":
                     return new CollisionBoxGroup();
+                case "IMPORT":
+                    return new Import();
 
                 default:
                     // if the tag name is invalid, simply skip interpreting this

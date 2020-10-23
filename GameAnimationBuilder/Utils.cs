@@ -10,6 +10,8 @@ namespace GameAnimationBuilder
 {
     static class Utils
     {
+        static public string WorkingDir = null;
+
         static private string[] _wordSeperators = null;
         static public string[] WordSeperators
         {
@@ -50,6 +52,7 @@ namespace GameAnimationBuilder
                     _tags.Add("ANIMATION");
                     _tags.Add("OBJECT_ANIMATIONS");
                     _tags.Add("COLLISION_BOX_GROUP");
+                    _tags.Add("IMPORT");
                 }
 
                 return _tags;
@@ -71,6 +74,52 @@ namespace GameAnimationBuilder
             }
         }
 
+        static public bool IsValidEncodedFilePath(string path)
+        {
+            if(path.Length < 2)
+                return false;
+
+            if(path[0] != '\"')
+                return false;
+
+            if(path[path.Length - 1] != '\"')
+                return false;
+
+            return true;
+        }
+
+        static public string EncodePath(string rawPath)
+        {
+            if(rawPath == "" || rawPath == null)
+                rawPath = Application.StartupPath;
+
+            // Replace white space with encode string
+            string result = rawPath.Replace(" ", Utils.AlternativeSpaceInPath);
+
+            // Add quotes
+            result = $"\"{result}\"";
+
+            return result;
+        }
+
+        static public string DecodePathToRaw(string encodedPath)
+        {
+            if(!IsValidEncodedFilePath(encodedPath))
+                throw new Exception("Invalid encoded file path!");
+
+            string result = encodedPath.Replace(Utils.AlternativeSpaceInPath, " ");
+            return result.Substring(1, result.Length - 2);
+        }
+
+        static public string DecodePathToWork(string encodedPath)
+        {
+            string result = DecodePathToRaw(encodedPath);
+
+            if(result[0] == '.')
+                result = WorkingDir + result.Substring(1, result.Length - 1);
+
+            return result;
+        }
 
         public static bool isSeperator(string s)
         {

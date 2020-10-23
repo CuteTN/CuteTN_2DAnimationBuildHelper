@@ -41,6 +41,8 @@
             this.checkBox_AutoAdd = new System.Windows.Forms.CheckBox();
             this.button_Export = new System.Windows.Forms.Button();
             this.checkBox_AutoView = new System.Windows.Forms.CheckBox();
+            this.textBox_WorkingDir = new System.Windows.Forms.TextBox();
+            this.button_ChangeWorkingDir = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Preview)).BeginInit();
             this.SuspendLayout();
             // 
@@ -58,7 +60,7 @@
             this.textBox_Code.Multiline = true;
             this.textBox_Code.Name = "textBox_Code";
             this.textBox_Code.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox_Code.Size = new System.Drawing.Size(862, 688);
+            this.textBox_Code.Size = new System.Drawing.Size(862, 653);
             this.textBox_Code.TabIndex = 0;
             this.textBox_Code.WordWrap = false;
             // 
@@ -196,13 +198,40 @@
             // 
             this.checkBox_AutoView.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox_AutoView.BackColor = System.Drawing.Color.Lavender;
+            this.checkBox_AutoView.Checked = true;
+            this.checkBox_AutoView.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox_AutoView.Location = new System.Drawing.Point(1165, 601);
             this.checkBox_AutoView.Name = "checkBox_AutoView";
             this.checkBox_AutoView.Size = new System.Drawing.Size(104, 30);
             this.checkBox_AutoView.TabIndex = 12;
             this.checkBox_AutoView.Text = "Auto View";
             this.checkBox_AutoView.UseVisualStyleBackColor = false;
-            this.checkBox_AutoView.CheckedChanged += new System.EventHandler(this.checkBox_AutoView_CheckedChanged);
+            // 
+            // textBox_WorkingDir
+            // 
+            this.textBox_WorkingDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_WorkingDir.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.textBox_WorkingDir.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox_WorkingDir.ForeColor = System.Drawing.Color.Thistle;
+            this.textBox_WorkingDir.Location = new System.Drawing.Point(12, 673);
+            this.textBox_WorkingDir.Name = "textBox_WorkingDir";
+            this.textBox_WorkingDir.ReadOnly = true;
+            this.textBox_WorkingDir.Size = new System.Drawing.Size(786, 30);
+            this.textBox_WorkingDir.TabIndex = 13;
+            this.textBox_WorkingDir.WordWrap = false;
+            this.textBox_WorkingDir.TextChanged += new System.EventHandler(this.textBox_WorkingDir_TextChanged);
+            // 
+            // button_ChangeWorkingDir
+            // 
+            this.button_ChangeWorkingDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_ChangeWorkingDir.Location = new System.Drawing.Point(804, 673);
+            this.button_ChangeWorkingDir.Name = "button_ChangeWorkingDir";
+            this.button_ChangeWorkingDir.Size = new System.Drawing.Size(72, 30);
+            this.button_ChangeWorkingDir.TabIndex = 14;
+            this.button_ChangeWorkingDir.Text = "Change";
+            this.button_ChangeWorkingDir.UseVisualStyleBackColor = true;
+            this.button_ChangeWorkingDir.Click += new System.EventHandler(this.button_ChangeWorkingDir_Click);
             // 
             // FormMain
             // 
@@ -210,6 +239,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkSlateBlue;
             this.ClientSize = new System.Drawing.Size(1385, 714);
+            this.Controls.Add(this.button_ChangeWorkingDir);
+            this.Controls.Add(this.textBox_WorkingDir);
             this.Controls.Add(this.checkBox_AutoView);
             this.Controls.Add(this.button_Export);
             this.Controls.Add(this.checkBox_AutoAdd);
@@ -251,6 +282,8 @@
         private System.Windows.Forms.CheckBox checkBox_AutoAdd;
         private System.Windows.Forms.Button button_Export;
         private System.Windows.Forms.CheckBox checkBox_AutoView;
+        private System.Windows.Forms.TextBox textBox_WorkingDir;
+        private System.Windows.Forms.Button button_ChangeWorkingDir;
     }
 }
 

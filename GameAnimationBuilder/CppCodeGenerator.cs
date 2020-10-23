@@ -38,7 +38,7 @@ namespace GameAnimationBuilder
                     Texture texture = item.Value as Texture;
 
                     int id = intIds[texture.StringId];
-                    string path = texture.Filepath;
+                    string path = Utils.DecodePathToRaw(texture.EncodedFilePath);
 
                     result += $"{id}\t{path}\n";
                 }

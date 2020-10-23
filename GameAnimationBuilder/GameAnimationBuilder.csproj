@@ -60,6 +60,7 @@
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
     <Compile Include="IAdditionalProperty.cs" />
+    <Compile Include="Import.cs" />
     <Compile Include="IScriptable.cs" />
     <Compile Include="ObjectAnimations.cs" />
     <Compile Include="Program.cs" />
