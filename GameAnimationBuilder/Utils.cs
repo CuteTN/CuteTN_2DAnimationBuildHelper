@@ -10,6 +10,7 @@ namespace GameAnimationBuilder
 {
     static class Utils
     {
+        static public string MainTitle = "Animation Build Helper";
         static public string WorkingDir = null;
 
         static private string[] _wordSeperators = null;

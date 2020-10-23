@@ -17,6 +17,19 @@ namespace GameAnimationBuilder
         #region Init
         public int TimeElapsed = 0;
 
+        private string _lastOpenedFilePath = null;
+        public string LastOpenedFilePath
+        {
+            get => _lastOpenedFilePath;
+            set
+            {
+                _lastOpenedFilePath = value;
+                this.Text = $"{Utils.MainTitle} - {Path.GetFileName(_lastOpenedFilePath)}";
+            }
+
+        }
+
+
         private AnimatingObject _selectedObj;
         public AnimatingObject SelectedObj
         {
@@ -46,6 +59,9 @@ namespace GameAnimationBuilder
 
             // preview pricture box
             pictureBox_Preview.SizeMode = PictureBoxSizeMode.CenterImage;
+
+            // form close
+            FormClosing += FormMain_FormClosing;
         }
         #endregion
 
@@ -63,7 +79,7 @@ namespace GameAnimationBuilder
         {
             if (TimeElapsed % 10 == 0)
             {
-                BackUp();
+                SaveBackUp();
                 RefreshSuggestionsList();
             }
 
@@ -89,9 +105,30 @@ namespace GameAnimationBuilder
             string word = Utils.GetWordAt(Code, index, out startPos, out endPos).ToUpper();
             Utils.ReplaceCurrentTextBoxWord(textBox_Code, word);
         }
+
+        private bool _codeModified;
+        private void textBox_Code_TextChanged(object sender, EventArgs e)
+        {
+            // cannot put BackUp here since it would fck up IO, dedlock or sth idk
+            _codeModified = true;
+        }
         #endregion
 
         #region buttons
+        private DialogResult RemindSaving()
+        {
+            if(!_codeModified || Code == "")
+                return DialogResult.No;
+
+            var dlgRes = MessageBox.Show(null, "Do you want to save your current code?", "Save change?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+            if(dlgRes == DialogResult.Yes)
+            {
+                button_Save_Click(null, null);
+            }
+
+            return DialogResult;
+        }
+
         private void InterpretScope(string scope, bool showError = true)
         {
             var words = new List<string>(scope.Split(Utils.WordSeperators, StringSplitOptions.RemoveEmptyEntries));
@@ -106,7 +143,7 @@ namespace GameAnimationBuilder
             }
             else
                 if(showError)
-                    MessageBox.Show(error, $"Cannot create {words[0]}: {words[1]}");
+                    MessageBox.Show(null, error, $"Cannot create {words[0]}: {words[1]}", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         /// <summary>
@@ -147,10 +184,14 @@ namespace GameAnimationBuilder
 
         private void button_Load_Click(object sender, EventArgs e)
         {
+            var dlgRes = RemindSaving();
+            if(dlgRes == DialogResult.Cancel)
+                return;
+
             OpenFileDialog dlg = new OpenFileDialog();
 
             dlg.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-            var dlgRes = dlg.ShowDialog();
+            dlgRes = dlg.ShowDialog();
 
             if(dlgRes == DialogResult.OK)
             {
@@ -160,6 +201,8 @@ namespace GameAnimationBuilder
                 Code = sw.ReadToEnd();
                 sw.Close();
                 sw.Dispose();
+
+                LastOpenedFilePath = dlg.FileName;
             }
         }
 
@@ -168,6 +211,13 @@ namespace GameAnimationBuilder
             SaveFileDialog dlg = new SaveFileDialog();
 
             dlg.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            
+            if(LastOpenedFilePath != null)
+            { 
+                dlg.InitialDirectory = Path.GetDirectoryName(LastOpenedFilePath);
+                dlg.FileName = Path.GetFileName(LastOpenedFilePath); 
+            }
+
             var dlgRes = dlg.ShowDialog();
 
             if (dlgRes == DialogResult.OK)
@@ -242,6 +292,11 @@ namespace GameAnimationBuilder
             {
                 textBox_WorkingDir.Text = dlg.SelectedPath;
             }
+        }
+
+        private void button_BackUp_Click(object sender, EventArgs e)
+        {
+            LoadBackUp();
         }
 
         private void button_Tricks_Click(object sender, EventArgs e)
@@ -355,6 +410,12 @@ namespace GameAnimationBuilder
             if (keyData == Keys.F7)
             {
                 button_Export_Click(null, null);
+                return true;
+            }
+
+            if (keyData == Keys.F8)
+            {
+                button_BackUp_Click(null, null);
                 return true;
             }
             #endregion
@@ -718,7 +779,7 @@ namespace GameAnimationBuilder
         #endregion
 
         #region Backup Code
-        private void BackUp()
+        private void SaveBackUp()
         {
             // nothing to backup. Also, this prevents overwriting backup data since the previous run 
             if(Code == "" || Code == null)
@@ -730,12 +791,33 @@ namespace GameAnimationBuilder
             sw.Dispose();
         }
 
+        private void LoadBackUp()
+        {
+            var dlgRes = RemindSaving();
+            if(dlgRes == DialogResult.Cancel)
+                return;
+
+            StreamReader sr = new StreamReader($"{Application.StartupPath}\\{Utils.BackUpFileName}");
+            Code = sr.ReadToEnd();
+            sr.Close();
+            sr.Dispose();
+        }
         #endregion
 
         #region Working Dir
         private void textBox_WorkingDir_TextChanged(object sender, EventArgs e)
         {
             Utils.WorkingDir = textBox_WorkingDir.Text;
+        }
+        #endregion
+
+        #region Handle Form close
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var dlgRes = RemindSaving();
+
+            // if user clicked on cancel on Reminding, don't close the window
+            e.Cancel = dlgRes == DialogResult.Cancel;
         }
         #endregion
     }

@@ -43,6 +43,8 @@
             this.checkBox_AutoView = new System.Windows.Forms.CheckBox();
             this.textBox_WorkingDir = new System.Windows.Forms.TextBox();
             this.button_ChangeWorkingDir = new System.Windows.Forms.Button();
+            this.label_WorkingDir = new System.Windows.Forms.Label();
+            this.button_BackUp = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Preview)).BeginInit();
             this.SuspendLayout();
             // 
@@ -63,6 +65,7 @@
             this.textBox_Code.Size = new System.Drawing.Size(862, 653);
             this.textBox_Code.TabIndex = 0;
             this.textBox_Code.WordWrap = false;
+            this.textBox_Code.TextChanged += new System.EventHandler(this.textBox_Code_TextChanged);
             // 
             // button_Save
             // 
@@ -214,10 +217,10 @@
             this.textBox_WorkingDir.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.textBox_WorkingDir.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox_WorkingDir.ForeColor = System.Drawing.Color.Thistle;
-            this.textBox_WorkingDir.Location = new System.Drawing.Point(12, 673);
+            this.textBox_WorkingDir.Location = new System.Drawing.Point(149, 673);
             this.textBox_WorkingDir.Name = "textBox_WorkingDir";
             this.textBox_WorkingDir.ReadOnly = true;
-            this.textBox_WorkingDir.Size = new System.Drawing.Size(786, 30);
+            this.textBox_WorkingDir.Size = new System.Drawing.Size(649, 30);
             this.textBox_WorkingDir.TabIndex = 13;
             this.textBox_WorkingDir.WordWrap = false;
             this.textBox_WorkingDir.TextChanged += new System.EventHandler(this.textBox_WorkingDir_TextChanged);
@@ -233,12 +236,36 @@
             this.button_ChangeWorkingDir.UseVisualStyleBackColor = true;
             this.button_ChangeWorkingDir.Click += new System.EventHandler(this.button_ChangeWorkingDir_Click);
             // 
+            // label_WorkingDir
+            // 
+            this.label_WorkingDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label_WorkingDir.AutoSize = true;
+            this.label_WorkingDir.Font = new System.Drawing.Font("Courier New", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_WorkingDir.Location = new System.Drawing.Point(14, 678);
+            this.label_WorkingDir.Name = "label_WorkingDir";
+            this.label_WorkingDir.Size = new System.Drawing.Size(129, 20);
+            this.label_WorkingDir.TabIndex = 15;
+            this.label_WorkingDir.Text = "Working Dir:";
+            // 
+            // button_BackUp
+            // 
+            this.button_BackUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_BackUp.Location = new System.Drawing.Point(945, 637);
+            this.button_BackUp.Name = "button_BackUp";
+            this.button_BackUp.Size = new System.Drawing.Size(104, 30);
+            this.button_BackUp.TabIndex = 16;
+            this.button_BackUp.Text = "BackUp (F8)";
+            this.button_BackUp.UseVisualStyleBackColor = true;
+            this.button_BackUp.Click += new System.EventHandler(this.button_BackUp_Click);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkSlateBlue;
             this.ClientSize = new System.Drawing.Size(1385, 714);
+            this.Controls.Add(this.button_BackUp);
+            this.Controls.Add(this.label_WorkingDir);
             this.Controls.Add(this.button_ChangeWorkingDir);
             this.Controls.Add(this.textBox_WorkingDir);
             this.Controls.Add(this.checkBox_AutoView);
@@ -284,6 +311,8 @@
         private System.Windows.Forms.CheckBox checkBox_AutoView;
         private System.Windows.Forms.TextBox textBox_WorkingDir;
         private System.Windows.Forms.Button button_ChangeWorkingDir;
+        private System.Windows.Forms.Label label_WorkingDir;
+        private System.Windows.Forms.Button button_BackUp;
     }
 }
 
