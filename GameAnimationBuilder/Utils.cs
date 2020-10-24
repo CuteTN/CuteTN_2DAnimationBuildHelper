@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -11,7 +12,6 @@ namespace GameAnimationBuilder
     static class Utils
     {
         static public string MainTitle = "Animation Build Helper";
-        static public string WorkingDir = null;
 
         static private string[] _wordSeperators = null;
         static public string[] WordSeperators
@@ -115,9 +115,13 @@ namespace GameAnimationBuilder
         static public string DecodePathToWork(string encodedPath)
         {
             string result = DecodePathToRaw(encodedPath);
+            result = Path.GetFullPath(result);
 
-            if(result[0] == '.')
-                result = WorkingDir + result.Substring(1, result.Length - 1);
+            // well, let's hope Directory class does the job well...
+            // -> Yes it does :)
+
+            //if(result[0] == '.')
+            //    result = WorkingDir + result.Substring(1, result.Length - 1);
 
             return result;
         }

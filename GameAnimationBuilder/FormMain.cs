@@ -168,11 +168,16 @@ namespace GameAnimationBuilder
         private void UpdateCurrentSelectionPreview()
         {
             string selectedCode = textBox_Code.SelectedText;
-            if (selectedCode == "")
+            
+            // if there are more than 1 word in selected code
+            if (selectedCode.Split(Utils.WordSeperators, StringSplitOptions.RemoveEmptyEntries).Length > 1)
             {
-                int startPos, endPos;
-                selectedCode = Utils.GetWordAt(Code, textBox_Code.SelectionStart - 1, out startPos, out endPos);
+                return;
             }
+
+            int startPos, endPos;
+            selectedCode = Utils.GetWordAt(Code, textBox_Code.SelectionStart - 1, out startPos, out endPos);
+
             var words = new List<string>(selectedCode.Split(Utils.WordSeperators, StringSplitOptions.RemoveEmptyEntries));
 
             if (words.Count == 1)
@@ -819,7 +824,8 @@ namespace GameAnimationBuilder
         #region Working Dir
         private void textBox_WorkingDir_TextChanged(object sender, EventArgs e)
         {
-            Utils.WorkingDir = textBox_WorkingDir.Text;
+            // Utils.WorkingDir = textBox_WorkingDir.Text;
+            Directory.SetCurrentDirectory(textBox_WorkingDir.Text);
         }
         #endregion
 
