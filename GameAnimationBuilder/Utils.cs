@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -75,37 +76,51 @@ namespace GameAnimationBuilder
             }
         }
 
-        static public bool IsValidEncodedFilePath(string path)
+        static public bool IsValidEncodedString(string str)
         {
-            if(path.Length < 2)
+            if(str.Length < 2)
                 return false;
 
-            if(path[0] != '\"')
+            if(str[0] != '\"')
                 return false;
 
-            if(path[path.Length - 1] != '\"')
+            if(str[str.Length - 1] != '\"')
+                return false;
+
+            if(str.Contains(" "))
+                return false;
+
+            // don't accept a stand-alone double prime
+            string temp = str.Substring(1, str.Length - 2);
+            while(temp.Contains("\"\""))
+                temp = temp.Replace("\"\"", "");
+            if(temp.Contains("\""))
                 return false;
 
             return true;
         }
 
-        static public string EncodePath(string rawPath)
+        static public string EncodeString(string rawStr, bool addQuote = true)
         {
-            if(rawPath == "" || rawPath == null)
-                rawPath = Application.StartupPath;
+            if(rawStr == "" || rawStr == null)
+                rawStr = Application.StartupPath;
 
             // Replace white space with encode string
-            string result = rawPath.Replace(" ", Utils.AlternativeSpaceInPath);
+            string result = rawStr.Replace(" ", Utils.AlternativeSpaceInPath);
+
+            // replace " by ""
+            result.Replace("\"", "\"\"");
 
             // Add quotes
-            result = $"\"{result}\"";
+            if(addQuote)
+                result = $"\"{result}\"";
 
             return result;
         }
 
-        static public string DecodePathToRaw(string encodedPath)
+        static public string DecodeStringToRaw(string encodedPath)
         {
-            if(!IsValidEncodedFilePath(encodedPath))
+            if(!IsValidEncodedString(encodedPath))
                 throw new Exception("Invalid encoded file path!");
 
             string result = encodedPath.Replace(Utils.AlternativeSpaceInPath, " ");
@@ -114,7 +129,7 @@ namespace GameAnimationBuilder
 
         static public string DecodePathToWork(string encodedPath)
         {
-            string result = DecodePathToRaw(encodedPath);
+            string result = DecodeStringToRaw(encodedPath);
             result = Path.GetFullPath(result);
 
             // well, let's hope Directory class does the job well...
@@ -190,6 +205,11 @@ namespace GameAnimationBuilder
             return GetAtAfterSplit(para, index, out startPos, out endPos, isEndScope);
         }
 
+        public static string GetStringAt(string para, int index, out int startPos, out int endPos)
+        {
+            return GetAtAfterSplit(para, index, out startPos, out endPos, (string str) => { return str == "\""; } );
+        }
+
         public static string ReplaceRange(string para, int startPos, int endPos, string value)
         {
             string result = para;
@@ -221,25 +241,18 @@ namespace GameAnimationBuilder
             textBox.SelectionStart = startPos + value.Length;
             textBox.SelectionLength = 0;
         }
-        #region Caret Position
-        ///for System.Windows.Forms.TextBox
-        public static System.Drawing.Point GetCaretPoint(System.Windows.Forms.TextBox textBox)
-        {
-            int start = textBox.SelectionStart;
-            if (start == textBox.TextLength)
-                start--;
 
-            return textBox.GetPositionFromCharIndex(start);
+        static public bool IsInString(string str, int index)
+        {
+            // count double primes in prefix
+            int countDP = Regex.Matches(str, "\"").Count;
+
+            if (countDP % 2 == 1)
+                return true;
+
+            return false;
         }
 
-        ///for System.Windows.Controls.TextBox requires reference to the following dlls: PresentationFramework, PresentationCore & WindowBase.
-        //So if not using those dlls you should comment the code below:
 
-        /*public static System.Windows.Point GetCaretPoint(System.Windows.Controls.TextBox textBox)
-        {
-            return textBox.GetRectFromCharacterIndex(textBox.SelectionStart).Location;
-        }*/
-
-        #endregion
     }
 }

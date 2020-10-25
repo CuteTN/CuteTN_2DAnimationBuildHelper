@@ -25,7 +25,7 @@ namespace GameAnimationBuilder
 
         public string RawFileName()
         {
-            return Path.GetFileName(Utils.DecodePathToRaw(EncodedFilePath));
+            return Path.GetFileName(Utils.DecodeStringToRaw(EncodedFilePath));
         }
 
         #region preview
@@ -84,7 +84,7 @@ namespace GameAnimationBuilder
             if(codeWords.Count != 2)
                 return $"Please follow this snippet: \n{GetSnippet()}";
 
-            if(!Utils.IsValidEncodedFilePath(codeWords[1]))
+            if(!Utils.IsValidEncodedString(codeWords[1]))
                 return $"Invalid filepath {codeWords[1]}";
 
             EncodedFilePath = codeWords[1];

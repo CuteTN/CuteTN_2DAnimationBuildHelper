@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -309,14 +310,16 @@ namespace GameAnimationBuilder
         {
             string tricks = "";
 
-            tricks += $"💡 In case your file path has whitespace in it, replace it with {Utils.AlternativeSpaceInPath}\n";
+            tricks += $"💡 In case a string has whitespace in it, replace it with {Utils.AlternativeSpaceInPath}\n";
+            tricks += $"💡 If a whitespace in a string is detected, it will ask you to automatically encode it after closing quote\n";
             tricks += $"💡 Press ? to trigger auto complete!!!\n";
             tricks += $"💡 You can press [F_Number key on buttons] instead of clicking on them\n";
             tricks += $"💡 Press ^ to uppercase the current word\n";
             tricks += $"💡 Press Ctrl+F5 to interpret just the current scope/command\n";
             tricks += $"💡 Press Ctrl+Enter at suggested tag to apply the snippet\n";
             tricks += $"💡 Auto Add: when you press {Utils.EndScopeChar}, data will be added automatically\n";
-            tricks += $"💡 If the program stops accidentally, you can still get your old code in the file {Utils.BackUpFileName}";
+            tricks += $"💡 If the program stops accidentally, you can still get your old code in the file {Utils.BackUpFileName}\n";
+            tricks += $"💡 You can change the working directory to the game resource folder for more convenience\n";
 
             MessageBox.Show(tricks, "Cool tips and tricks");
         }
@@ -368,6 +371,20 @@ namespace GameAnimationBuilder
                 SetIdPrefix(); 
 
                 return true;
+            }
+
+            // press " - check auto encode string
+            if(keyData == (Keys.Oem7 | Keys.Shift))
+            {
+                if(textBox_Code.Focused)
+                { 
+                    HandleAutoEncodeString();
+
+                    int tempSStart = textBox_Code.SelectionStart;
+                    Code = Code.Insert(tempSStart, "\"");
+                    textBox_Code.SelectionStart = tempSStart + 1;
+                    return true;
+                }
             }
 
             #region buttons shortcut
@@ -688,7 +705,7 @@ namespace GameAnimationBuilder
 
             if(res == DialogResult.OK)
             {
-                string encodedPath = Utils.EncodePath(dlg.FileName);
+                string encodedPath = Utils.EncodeString(dlg.FileName);
                 Utils.ReplaceCurrentTextBoxWord(textBox_Code, encodedPath);
             }
         }
@@ -835,6 +852,56 @@ namespace GameAnimationBuilder
 
             // if user clicked on cancel on Reminding, don't close the window
             e.Cancel = dlgRes == DialogResult.Cancel;
+        }
+        #endregion
+
+        #region Auto encode string
+
+        /// <summary>
+        /// index the index of a character that maybe in a string
+        /// </summary>
+        /// <param name="index"></param>
+        private bool IsInInvalidString(string str, int index)
+        {
+            // index not in string
+            if(!Utils.IsInString(str, index))
+                return false; 
+
+            int startPos, endPos;
+            string temp = $"\"{Utils.GetStringAt(str, index, out startPos, out endPos)}\"";
+            return !Utils.IsValidEncodedString(temp);
+        }
+
+        /// <summary>
+        /// specifies what to do when user closed a string
+        /// </summary>
+        /// <param name="index"></param>
+        private bool HandleAutoEncodeString()
+        {
+            int index = textBox_Code.SelectionStart - 1;
+            if(index < 0)
+                index++;
+
+            if(!IsInInvalidString(Code, index))
+                return false;
+
+            var dlgRes = MessageBox.Show(null, "You've input a string with invalid format\nWould you like to fix it automatically", "Invalid string format", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+
+            if(dlgRes == DialogResult.No)
+                return false;
+
+            string temp1 = Code.Substring(0, index+1);
+            int startPos, endPos;
+            string temp = Utils.GetStringAt(temp1, index, out startPos, out endPos);
+            
+            temp = Utils.EncodeString(temp);
+            temp = temp.Substring(1, temp.Length - 2);
+            
+            Code = Code.Remove(startPos, endPos - startPos + 1);
+            Code = Code.Insert(startPos, temp);
+            textBox_Code.SelectionStart = startPos + temp.Length;
+
+            return true;
         }
         #endregion
     }

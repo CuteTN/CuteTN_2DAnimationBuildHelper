@@ -83,7 +83,7 @@ namespace GameAnimationBuilder
             
             try
             { 
-                if(!Utils.IsValidEncodedFilePath(codeWords[2]))
+                if(!Utils.IsValidEncodedString(codeWords[2]))
                     return $"Invalid filepath {codeWords[2]}";
 
                 EncodedFilePath = codeWords[2];
