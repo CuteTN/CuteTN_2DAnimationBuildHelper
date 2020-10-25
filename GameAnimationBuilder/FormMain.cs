@@ -126,7 +126,7 @@ namespace GameAnimationBuilder
                 button_Save_Click(null, null);
             }
 
-            return DialogResult;
+            return dlgRes;
         }
 
         private void InterpretScope(string scope, bool showError = true)
@@ -134,7 +134,6 @@ namespace GameAnimationBuilder
             var words = new List<string>(scope.Split(Utils.WordSeperators, StringSplitOptions.RemoveEmptyEntries));
             string error = "";
             var tempObj = AnimatingObject.InterpretScope(words, out error);
-
 
             if (error == "" || error == null)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace GameAnimationBuilder
         */
         public List<StateAnimation> States = new List<StateAnimation>();
         static private readonly int parametersOnLine = 5;
+        public int TotalDuration = 0;
 
         public ContextType GetContext(int order)
         {
@@ -128,6 +130,7 @@ namespace GameAnimationBuilder
 
                 StateAnimation state = new StateAnimation(stateId, anim, flipX, flipY, timesRotate90);
                 States.Add(state);
+                TotalDuration += state.TotalDuration;
             }
 
             return "";
@@ -139,6 +142,28 @@ namespace GameAnimationBuilder
 
             foreach(var state in States)
                 state.AddToLib();
+        }
+
+        public override Bitmap GetPreviewBitmap(int time = 0)
+        {
+            if (TotalDuration == 0)
+                return base.GetPreviewBitmap(time);
+
+            int modTime = time % TotalDuration;
+
+            int sum = 0;
+            for (int i = 0; i < States.Count; i++)
+            {
+                sum += States[i].TotalDuration;
+
+                if (sum >= modTime)
+                {
+                    return States[i].GetPreviewBitmap(modTime);
+                }
+            }
+
+            // It can be proven the code can not reach here
+            return null;
         }
     }
 }

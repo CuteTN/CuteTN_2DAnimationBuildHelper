@@ -21,6 +21,12 @@ namespace GameAnimationBuilder
         public bool FlipY;
         public int TimesRotate90;
 
+        public int TotalDuration
+        {
+            get;
+            private set;
+        }
+
 
         /// <summary>
         /// Caution: the image would flip before it rotates
@@ -37,6 +43,7 @@ namespace GameAnimationBuilder
             FlipX = flipX;
             FlipY = flipY;
             TimesRotate90 = (timesRotate90 % 4 + 4) % 4;
+            TotalDuration = animation.TotalDuration;
         }
 
         public override Bitmap GetPreviewBitmap(int time = 0)
