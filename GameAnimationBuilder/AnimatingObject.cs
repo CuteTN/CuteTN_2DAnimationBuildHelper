@@ -32,6 +32,7 @@ namespace GameAnimationBuilder
         ObjectAnimatons = 104,
         Class = 105,
         Object = 106,
+        Section = 107,
     }
 
     public abstract class AnimatingObject
@@ -121,6 +122,8 @@ namespace GameAnimationBuilder
                     return new CClass();
                 case "OBJECT":
                     return new CObject();
+                case "SECTION":
+                    return new Section();
 
                 default:
                     // if the tag name is invalid, simply skip interpreting this

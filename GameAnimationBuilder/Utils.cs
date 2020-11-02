@@ -59,6 +59,7 @@ namespace GameAnimationBuilder
                     _tags.Add("IMPORT");
                     _tags.Add("CLASS");
                     _tags.Add("OBJECT");
+                    _tags.Add("SECTION");
                 }
 
                 return _tags;

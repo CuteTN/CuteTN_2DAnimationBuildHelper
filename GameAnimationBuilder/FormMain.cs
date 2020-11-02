@@ -59,7 +59,7 @@ namespace GameAnimationBuilder
             timer.Start();
 
             // preview pricture box
-            pictureBox_Preview.SizeMode = PictureBoxSizeMode.CenterImage;
+            pictureBox_Preview.SizeMode = PictureBoxSizeMode.Zoom;
 
             // form close
             FormClosing += FormMain_FormClosing;
@@ -320,6 +320,7 @@ namespace GameAnimationBuilder
             tricks += $"💡 Auto Add: when you press {Utils.EndScopeChar}, data will be added automatically\n";
             tricks += $"💡 If the program stops accidentally, you can still get your old code in the file {Utils.BackUpFileName}\n";
             tricks += $"💡 You can change the working directory to the game resource folder for more convenience\n";
+            tricks += $"💡 Let the value of a property in a class be {Utils.UndefinedValue} to mark it as undefined\n";
 
             MessageBox.Show(tricks, "Cool tips and tricks");
         }
@@ -543,6 +544,8 @@ namespace GameAnimationBuilder
                     return AnimatingObjectsLib.Instance.GetAllIdOfType<CClass>();
                 case ContextType.Object:
                     return AnimatingObjectsLib.Instance.GetAllIdOfType<CObject>();
+                case ContextType.Section:
+                    return AnimatingObjectsLib.Instance.GetAllIdOfType<Section>();
                 case ContextType.Data:
                     return AnimatingObjectsLib.Instance.GetAllIdOfType<Object>();
                 case ContextType.Type:

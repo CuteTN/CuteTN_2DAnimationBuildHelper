@@ -45,6 +45,7 @@
             this.button_ChangeWorkingDir = new System.Windows.Forms.Button();
             this.label_WorkingDir = new System.Windows.Forms.Label();
             this.button_BackUp = new System.Windows.Forms.Button();
+            this.button_GUI = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Preview)).BeginInit();
             this.SuspendLayout();
             // 
@@ -241,6 +242,7 @@
             this.label_WorkingDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label_WorkingDir.AutoSize = true;
             this.label_WorkingDir.Font = new System.Drawing.Font("Courier New", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_WorkingDir.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
             this.label_WorkingDir.Location = new System.Drawing.Point(14, 678);
             this.label_WorkingDir.Name = "label_WorkingDir";
             this.label_WorkingDir.Size = new System.Drawing.Size(129, 20);
@@ -258,12 +260,23 @@
             this.button_BackUp.UseVisualStyleBackColor = true;
             this.button_BackUp.Click += new System.EventHandler(this.button_BackUp_Click);
             // 
+            // button_GUI
+            // 
+            this.button_GUI.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_GUI.Location = new System.Drawing.Point(1055, 601);
+            this.button_GUI.Name = "button_GUI";
+            this.button_GUI.Size = new System.Drawing.Size(104, 30);
+            this.button_GUI.TabIndex = 17;
+            this.button_GUI.Text = "GUI";
+            this.button_GUI.UseVisualStyleBackColor = true;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkSlateBlue;
             this.ClientSize = new System.Drawing.Size(1385, 714);
+            this.Controls.Add(this.button_GUI);
             this.Controls.Add(this.button_BackUp);
             this.Controls.Add(this.label_WorkingDir);
             this.Controls.Add(this.button_ChangeWorkingDir);
@@ -313,6 +326,7 @@
         private System.Windows.Forms.Button button_ChangeWorkingDir;
         private System.Windows.Forms.Label label_WorkingDir;
         private System.Windows.Forms.Button button_BackUp;
+        private System.Windows.Forms.Button button_GUI;
     }
 }
 
