@@ -36,6 +36,8 @@ namespace GameAnimationBuilder
 
         public static readonly char EndScopeChar = ';';
         public static readonly string AlternativeSpaceInPath = "<>";
+        public static readonly string UndefinedValue = "-";
+        public static readonly string SpecialProp_Preview = "Preview";
 
         public static readonly string UnknownErrorMsg = "Unknown Error!";
         public static readonly string BackUpFileName = "ANIMATION_BACKUPFILE.txt";
@@ -55,6 +57,8 @@ namespace GameAnimationBuilder
                     _tags.Add("OBJECT_ANIMATIONS");
                     _tags.Add("COLLISION_BOX_GROUP");
                     _tags.Add("IMPORT");
+                    _tags.Add("CLASS");
+                    _tags.Add("OBJECT");
                 }
 
                 return _tags;
@@ -253,6 +257,16 @@ namespace GameAnimationBuilder
             return false;
         }
 
+        static public ContextType ParseContextType(string str)
+        {
+            ContextType result = ContextType.Unknown;
+            try
+            {
+                result = (ContextType)Enum.Parse(typeof(ContextType), str);
+            }
+            catch { }
 
+            return result;
+        }
     }
 }

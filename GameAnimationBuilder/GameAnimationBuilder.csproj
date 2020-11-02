@@ -49,6 +49,8 @@
     <Compile Include="AnimatingObject.cs" />
     <Compile Include="AnimatingObjectsLib.cs" />
     <Compile Include="Animation.cs" />
+    <Compile Include="CClass.cs" />
+    <Compile Include="CObject.cs" />
     <Compile Include="CollisionBox.cs" />
     <Compile Include="CollisionBoxGroup.cs" />
     <Compile Include="CppCodeGenerator.cs" />
@@ -60,11 +62,13 @@
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
     <Compile Include="IAdditionalProperty.cs" />
+    <Compile Include="IDynamicContext.cs" />
     <Compile Include="Import.cs" />
     <Compile Include="IScriptable.cs" />
     <Compile Include="ObjectAnimations.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyInfo.cs" />
     <Compile Include="SmartAutoCompletionSorter.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="StateAnimation.cs" />

@@ -10,20 +10,28 @@ namespace GameAnimationBuilder
 {
     public enum ContextType
     {
-        Tag,
-        Id,
-        Int,
-        Bool,
-        ImageFilePath,
-        TextFilePath,
-        Texture,
-        Sprite,
-        Animation,
-        ObjectAnimatons,
-        ObjectKind,
-        NewStateId,
-        NewCollisionBoxId,
-        Unknown,
+        // primitive
+        Unknown = 0,
+        Tag = 1,
+        Id = 2,
+        Int = 3,
+        Bool = 4,
+        String = 5,
+        ImageFilePath = 6,
+        TextFilePath = 7,
+        NewStateId = 8,
+        NewCollisionBoxId = 9,
+        Type = 10,
+        NewClassProp = 11,
+
+        // Data
+        Data = 100, // Everything in lib 
+        Texture = 101,
+        Sprite = 102,
+        Animation = 103,
+        ObjectAnimatons = 104,
+        Class = 105,
+        Object = 106,
     }
 
     public abstract class AnimatingObject
@@ -109,6 +117,10 @@ namespace GameAnimationBuilder
                     return new CollisionBoxGroup();
                 case "IMPORT":
                     return new Import();
+                case "CLASS":
+                    return new CClass();
+                case "OBJECT":
+                    return new CObject();
 
                 default:
                     // if the tag name is invalid, simply skip interpreting this

@@ -78,7 +78,7 @@ namespace GameAnimationBuilder
 
         private void MyUpdate()
         {
-            if (TimeElapsed % 10 == 0)
+            if (TimeElapsed % 100 == 0)
             {
                 SaveBackUp();
                 RefreshSuggestionsList();
@@ -463,10 +463,11 @@ namespace GameAnimationBuilder
         #endregion
 
         #region Auto completion :^)
-        private ContextType GetCurrentContext(out string currentTag, out int orderInScope)
+        private ContextType GetCurrentContext(out string currentTag, out int orderInScope, out List<string> words)
         {
             orderInScope = 0;
             currentTag = "";
+            words = new List<string>();
 
             // if the text is currently selected, skip
             if(textBox_Code.SelectedText != "")
@@ -483,12 +484,12 @@ namespace GameAnimationBuilder
             // cut everything after index off, we don't care about them!
             currentScope = currentScope.Substring(0, index - startScope + 1);
 
-            var words = currentScope.Split(Utils.WordSeperators, StringSplitOptions.RemoveEmptyEntries);
+            words = currentScope.Split(Utils.WordSeperators, StringSplitOptions.RemoveEmptyEntries).ToList();
 
             // tag simply is the first word in the scope
-            currentTag = words.Length>0? words[0]:"";
+            currentTag = words.Count>0? words[0]:"";
 
-            orderInScope = words.Length;
+            orderInScope = words.Count;
 
             // if the selection is in the middle of a word
             if(!Utils.isSeperator(currentScope.Last().ToString()))
@@ -502,7 +503,24 @@ namespace GameAnimationBuilder
             if(obj == null)
                 return ContextType.Unknown;
             else
+            {
+                if(obj is IDynamicContext)
+                    return (obj as IDynamicContext).GetDynamicContext(orderInScope, words.ToList());
+
                 return (obj as IScriptable).GetContext(orderInScope);
+            }
+        }
+
+        private ContextType GetCurrentContext(out string currentTag, out int orderInScope)
+        {
+            List<string> words;
+            return GetCurrentContext(out currentTag, out orderInScope, out words);
+        }
+
+        private ContextType GetCurrentContext()
+        {
+            string tag; int order; List<string> words;
+            return GetCurrentContext(out tag, out order, out words);
         }
 
         private List<string> GetSuggestionOnContext(ContextType context)
@@ -521,6 +539,14 @@ namespace GameAnimationBuilder
                 case ContextType.Animation:
                 case ContextType.NewStateId:
                     return AnimatingObjectsLib.Instance.GetAllIdOfType<Animation>();
+                case ContextType.Class:
+                    return AnimatingObjectsLib.Instance.GetAllIdOfType<CClass>();
+                case ContextType.Object:
+                    return AnimatingObjectsLib.Instance.GetAllIdOfType<CObject>();
+                case ContextType.Data:
+                    return AnimatingObjectsLib.Instance.GetAllIdOfType<Object>();
+                case ContextType.Type:
+                    return Enum.GetNames(typeof(ContextType)).ToList();
                 default:
                     // return empty list: Unknown, Int, FilePath, Id
                     return new List<string>();
@@ -529,8 +555,7 @@ namespace GameAnimationBuilder
 
         private void RefreshSuggestionsList()
         {
-            string tag; int order;
-            var context = GetCurrentContext(out tag, out order);
+            var context = GetCurrentContext();
 
             var suggestions = GetSuggestionOnContext(context);
             SortSuggestions(ref suggestions);
@@ -558,8 +583,7 @@ namespace GameAnimationBuilder
 
         private void ApplySuggestionSpecial()
         {
-            string tag; int order;
-            var context = GetCurrentContext(out tag, out order);
+            var context = GetCurrentContext();
 
             string suggestion = listBox_Suggestions.SelectedItem as string;
 
@@ -607,8 +631,7 @@ namespace GameAnimationBuilder
         /// </summary>
         private void ApplySnippet()
         {
-            string tag; int order;
-            var context = GetCurrentContext(out tag, out order);
+            var context = GetCurrentContext();
             if (context != ContextType.Tag)
                 return;
 
@@ -654,8 +677,7 @@ namespace GameAnimationBuilder
 
             if(keyData == (Keys.Enter | Keys.Control))
             {
-                string tag; int order;
-                var context = GetCurrentContext(out tag, out order);
+                var context = GetCurrentContext();
 
                 if (context == ContextType.Tag)
                     ApplySnippet();
@@ -712,8 +734,7 @@ namespace GameAnimationBuilder
 
         private void PeekImagePath()
         {
-            string tag; int order;
-            var context = GetCurrentContext(out tag, out order);
+            var context = GetCurrentContext();
             if (context != ContextType.ImageFilePath)
                 return;
 
@@ -722,8 +743,7 @@ namespace GameAnimationBuilder
 
         private void PeekTextPath()
         {
-            string tag; int order;
-            var context = GetCurrentContext(out tag, out order);
+            var context = GetCurrentContext();
             if (context != ContextType.TextFilePath)
                 return;
 
@@ -769,8 +789,8 @@ namespace GameAnimationBuilder
                 return;
             }    
 
-            string tag; int order;
-            var context = GetCurrentContext(out tag, out order);
+            string tag; int order; List<string> words;
+            var context = GetCurrentContext(out tag, out order, out words);
 
             var obj = AnimatingObject.CreateTypeFromTag(tag);
 
@@ -789,6 +809,10 @@ namespace GameAnimationBuilder
             }
 
             var hint = (obj as IScriptable)?.GetHint(order);
+
+            if(obj is IDynamicContext)
+                hint = (obj as IDynamicContext).GetDynamicHint(order, words);
+
             textBox_Hint.Text = hint;
         }
 
