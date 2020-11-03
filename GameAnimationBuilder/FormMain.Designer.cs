@@ -45,7 +45,7 @@
             this.button_ChangeWorkingDir = new System.Windows.Forms.Button();
             this.label_WorkingDir = new System.Windows.Forms.Label();
             this.button_BackUp = new System.Windows.Forms.Button();
-            this.button_GUI = new System.Windows.Forms.Button();
+            this.button_Designer = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Preview)).BeginInit();
             this.SuspendLayout();
             // 
@@ -110,6 +110,7 @@
             this.pictureBox_Preview.Location = new System.Drawing.Point(883, 14);
             this.pictureBox_Preview.Name = "pictureBox_Preview";
             this.pictureBox_Preview.Size = new System.Drawing.Size(490, 215);
+            this.pictureBox_Preview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox_Preview.TabIndex = 4;
             this.pictureBox_Preview.TabStop = false;
             // 
@@ -260,15 +261,16 @@
             this.button_BackUp.UseVisualStyleBackColor = true;
             this.button_BackUp.Click += new System.EventHandler(this.button_BackUp_Click);
             // 
-            // button_GUI
+            // button_Designer
             // 
-            this.button_GUI.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_GUI.Location = new System.Drawing.Point(1055, 601);
-            this.button_GUI.Name = "button_GUI";
-            this.button_GUI.Size = new System.Drawing.Size(104, 30);
-            this.button_GUI.TabIndex = 17;
-            this.button_GUI.Text = "GUI";
-            this.button_GUI.UseVisualStyleBackColor = true;
+            this.button_Designer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_Designer.Location = new System.Drawing.Point(1055, 601);
+            this.button_Designer.Name = "button_Designer";
+            this.button_Designer.Size = new System.Drawing.Size(104, 30);
+            this.button_Designer.TabIndex = 17;
+            this.button_Designer.Text = "Designer";
+            this.button_Designer.UseVisualStyleBackColor = true;
+            this.button_Designer.Click += new System.EventHandler(this.button_Designer_Click);
             // 
             // FormMain
             // 
@@ -276,7 +278,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkSlateBlue;
             this.ClientSize = new System.Drawing.Size(1385, 714);
-            this.Controls.Add(this.button_GUI);
+            this.Controls.Add(this.button_Designer);
             this.Controls.Add(this.button_BackUp);
             this.Controls.Add(this.label_WorkingDir);
             this.Controls.Add(this.button_ChangeWorkingDir);
@@ -326,7 +328,7 @@
         private System.Windows.Forms.Button button_ChangeWorkingDir;
         private System.Windows.Forms.Label label_WorkingDir;
         private System.Windows.Forms.Button button_BackUp;
-        private System.Windows.Forms.Button button_GUI;
+        private System.Windows.Forms.Button button_Designer;
     }
 }
 

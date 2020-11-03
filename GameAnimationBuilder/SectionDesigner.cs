@@ -16,5 +16,9 @@ namespace GameAnimationBuilder
         {
             InitializeComponent();
         }
+
+        public SectionDesigner(Section section) : this()
+        {
+        }
     }
 }

@@ -58,9 +58,6 @@ namespace GameAnimationBuilder
             timer.Tick += Timer_Tick;
             timer.Start();
 
-            // preview pricture box
-            pictureBox_Preview.SizeMode = PictureBoxSizeMode.Zoom;
-
             // form close
             FormClosing += FormMain_FormClosing;
         }
@@ -87,6 +84,7 @@ namespace GameAnimationBuilder
             if(AutoView && !IsSuggestionsVisible)
                 UpdateCurrentSelectionPreview();
 
+            UpdateDesignerButton();
             UpdateCurrentHint();
             Invalidate();
         }
@@ -930,6 +928,43 @@ namespace GameAnimationBuilder
 
             return true;
         }
+        #endregion
+
+        #region Designer
+        private void UpdateDesignerButton()
+        {
+            int index = textBox_Code.SelectionStart;
+            if(index > 0)
+                index --;
+
+            int startPos, endPos;
+            string word = Utils.GetWordAt(Code, index, out startPos, out endPos);
+            
+            button_Designer.Enabled = AnimatingObjectsLib.Instance.Get(word) is Section;
+        }
+
+        #region Section Designer
+        private void button_Designer_Click(object sender, EventArgs e)
+        {
+            int index = textBox_Code.SelectionStart;
+            if(index > 0)
+                index --;
+
+            int startPos, endPos;
+            string word = Utils.GetWordAt(Code, index, out startPos, out endPos);
+            
+            var obj = AnimatingObjectsLib.Instance.Get(word);
+
+            if(obj is Section)
+            {
+                var section = obj as Section;
+                SectionDesigner sd = new SectionDesigner(section);
+                sd.ShowInTaskbar = false;
+                sd.ShowDialog();
+            }
+        }
+        #endregion
+
         #endregion
     }
 }
