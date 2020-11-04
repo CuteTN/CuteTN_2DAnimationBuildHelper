@@ -37,7 +37,13 @@ namespace GameAnimationBuilder
         public static readonly char EndScopeChar = ';';
         public static readonly string AlternativeSpaceInPath = "<>";
         public static readonly string UndefinedValue = "-";
+
+        #region Special properties
         public static readonly string SpecialProp_Preview = "Preview";
+        public static readonly string SpecialProp_Section = "Section";
+        public static readonly string SpecialProp_X = "X";
+        public static readonly string SpecialProp_Y = "Y";
+        #endregion
 
         public static readonly string UnknownErrorMsg = "Unknown Error!";
         public static readonly string BackUpFileName = "ANIMATION_BACKUPFILE.txt";

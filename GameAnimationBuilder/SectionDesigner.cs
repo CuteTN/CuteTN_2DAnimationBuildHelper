@@ -1,10 +1,12 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,9 +21,22 @@ namespace GameAnimationBuilder
 
         Bitmap PreviewBitmap;
 
+        #region init
+        /// <summary>
+        /// return null if the library of animating objects is not there yet...
+        /// </summary>
         public CClass SelectedClass
         {
-            get => AnimatingObjects[comboBox_Class.Text] as CClass;
+            get 
+            {
+                if(AnimatingObjects == null || AnimatingObjects.Count == 0)
+                {
+                    return null;
+                }
+
+                CClass result = AnimatingObjects[comboBox_Class.Text] as CClass;
+                return result;
+            }
         }
 
         /// <summary>
@@ -40,15 +55,11 @@ namespace GameAnimationBuilder
                     // CuteTN note: it must be a CObject or not defined id here
                     return AnimatingObjects[id] as CObject;
                 }
-                else
-                {
-                    // CuteTN Note: be careful...
-                    return new CObject();
-                }
+
+                return null;
             }
         }
 
-        #region init
         private SectionDesigner()
         {
             InitializeComponent();
@@ -127,20 +138,12 @@ namespace GameAnimationBuilder
         }
         private void LoadPropertiesOfObject()
         {
+            if(SelectedClass == null)
+                return;
+
             var propNames = SelectedClass.GetUndefinedPropertiesNames();
 
             dataGridView_Properties.Rows.Clear();
-
-            if(dataGridView_Objects.SelectedRows.Count == 1)
-            {
-                dataGridView_Properties.Rows.Add("Id", SelectedObject.StringId);
-                dataGridView_Properties.Rows[0].Cells[1].ReadOnly = false;
-            }
-            else
-            {
-                dataGridView_Properties.Rows.Add("Id", Utils.UndefinedValue);
-                dataGridView_Properties.Rows[0].Cells[1].ReadOnly = true;
-            }
 
             foreach(var propName in propNames)
             {
@@ -160,7 +163,7 @@ namespace GameAnimationBuilder
         }
         private void dataGridView_Objects_SelectionChanged(object sender, EventArgs e)
         {
-            LoadPropertiesOfObject(); 
+            MyUpdate();
         }
         #endregion
 
@@ -172,30 +175,15 @@ namespace GameAnimationBuilder
         }
         #endregion
 
-        #region update rendering
-        private void UpdatePreviewPictureBox()
-        {
-            Texture background = AnimatingObjects[Section.TextureId] as Texture;
-            pictureBox_SectionPreview.Image = background.Bitmap; 
-        }
 
-        private void SectionDesigner_Paint(object sender, PaintEventArgs e)
-        {
-            UpdatePreviewPictureBox();
-        }
-
-        #endregion
 
         #region Update value to data
-        private void UpdateValueNotId()
+        private void EditChangedValue()
         {
             foreach(DataGridViewRow propRow in dataGridView_Properties.Rows)
             {
                 string propName = propRow.Cells[0].Value as string;
                 string propVal = propRow.Cells[1].Value as string;
-
-                if(propName == "Id")
-                    continue;
 
                 if(propVal == Utils.UndefinedValue)
                     continue;
@@ -212,7 +200,156 @@ namespace GameAnimationBuilder
 
         private void dataGridView_Properties_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            UpdateValueNotId();
+            EditChangedValue();
+            MyUpdate();
+        }
+        #endregion
+
+        #region Update
+        private void MyUpdate()
+        {
+            // Do not load object from selected class here :) it would cause circular recursion
+
+            LoadPropertiesOfObject();
+            Invalidate();
+        }
+        #endregion
+
+        #region Add new Game object
+
+        /// <summary>
+        /// CuteTN note: VERY DIRTY CODE HERE, couple with the creation of CObject
+        /// Cant fix because the initializing data was hardcoded in the ParseData function :)
+        /// </summary>
+        private List<string> GenerateCodeAddNewObject(string id)
+        {
+            var result = new List<string>();
+
+            result.Add("OBJECT");
+            result.Add(id);
+            result.Add(SelectedClass.StringId);
+
+            int unknownValsCount = SelectedClass.GetUndefinedPropertyCount();
+            for(int i=0; i<unknownValsCount; i++)
+                result.Add(Utils.UndefinedValue);
+
+            return result;
+        }
+
+        private string CombinePrefixNumber(string prefix, int number)
+        {
+            return $"{prefix}_{number}";
+        }
+
+        private int AutoGenerateIdNumber(string prefix, Func<string, int, string> toStringFunc)
+        {
+            for(int i=0; ; i++)
+            {
+                var temp = toStringFunc(prefix, i);
+                if(!AnimatingObjects.ContainsKey(temp))
+                    return i;
+            }
+        }
+
+        private void AddNewObject(int? idNumber = null)
+        {
+            int idNum = 0; 
+            string classId = SelectedClass.StringId;
+
+            if (idNumber == null)
+                idNum = AutoGenerateIdNumber(classId, CombinePrefixNumber);
+            else
+                idNum = idNumber.Value;
+
+            string id = CombinePrefixNumber(classId, idNum);
+
+            ///// Add to data
+            var codewords = GenerateCodeAddNewObject(id);
+            var obj = new CObject();
+            obj.ParseData(codewords);
+            
+            try { obj.SetProperty(Utils.SpecialProp_Section, Section.StringId); }
+            catch { }
+
+            try { obj.SetProperty(Utils.SpecialProp_X, "0"); }
+            catch { }
+
+            try { obj.SetProperty(Utils.SpecialProp_Y, "0"); }
+            catch { }
+
+            AnimatingObjects.Add(id, obj);
+
+            LoadObjectsOfSelectedClass();
+            MyUpdate();
+        }
+
+        private void button_Add_Click(object sender, EventArgs e)
+        {
+            AddNewObject();
+        }
+        #endregion
+
+        #region update rendering
+
+        /// <summary>
+        /// return true if draw successfully
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private bool DrawVisibleObject(CObject obj, Graphics g)
+        {
+            int x, y;
+            Bitmap preview;
+
+            // don't draw object of another section
+            try
+            { 
+                if(obj.GetProperty(Utils.SpecialProp_Section).EncodedValue != Section.StringId)
+                    return false;
+            }
+            catch
+            {
+                return false;
+            }
+
+            try { x = int.Parse(obj.GetProperty(Utils.SpecialProp_X).EncodedValue); }
+            catch { return false;}
+
+            try { y = int.Parse(obj.GetProperty(Utils.SpecialProp_Y).EncodedValue); }
+            catch { return false;}
+
+            try { 
+                var prop = obj.GetProperty(Utils.SpecialProp_Preview);
+                preview = AnimatingObjects[prop.EncodedValue].GetPreviewBitmap();
+            }
+            catch { return false;}
+
+            g.DrawImage(preview, x, y);
+
+            return true;
+        }
+
+        private void UpdatePreviewPictureBox()
+        {
+            Texture background = AnimatingObjects[Section.TextureId] as Texture;
+            PreviewBitmap = new Bitmap(background.Bitmap);
+
+            Graphics g = Graphics.FromImage(PreviewBitmap);
+
+            foreach(DataGridViewRow objRow in dataGridView_Objects.Rows)
+            {
+                string objId = objRow.Cells[0].Value as string;
+                CObject obj = AnimatingObjects[objId] as CObject;
+
+                DrawVisibleObject(obj, g);
+            }
+
+            pictureBox_SectionPreview.Image = PreviewBitmap;
+        }
+
+        private void SectionDesigner_Paint(object sender, PaintEventArgs e)
+        {
+            UpdatePreviewPictureBox();
         }
         #endregion
 

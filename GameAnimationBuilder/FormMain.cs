@@ -548,6 +548,8 @@ namespace GameAnimationBuilder
                     return AnimatingObjectsLib.Instance.GetAllIdOfType<Object>();
                 case ContextType.Type:
                     return Enum.GetNames(typeof(ContextType)).ToList();
+                case ContextType.ObjectAnimatons:
+                    return AnimatingObjectsLib.Instance.GetAllIdOfType<ObjectAnimations>();
                 default:
                     // return empty list: Unknown, Int, FilePath, Id
                     return new List<string>();
