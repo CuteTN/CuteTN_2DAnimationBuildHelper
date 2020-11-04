@@ -13,6 +13,10 @@ namespace GameAnimationBuilder
         public string ClassId;
 
         public List<string> UndefinedPropsVal;
+
+        /// <summary>
+        /// Shallow copied from class
+        /// </summary>
         public List<PropertyInfo> Properties;
 
         private void GenerateCompleteProps()
@@ -51,6 +55,12 @@ namespace GameAnimationBuilder
         public PropertyInfo GetProperty(int index)
         {
             return Properties[index];
+        }
+
+        public void SetProperty(string propName, string newValue)
+        {
+            var prop = GetProperty(propName);
+            prop.EncodedValue = newValue;
         }
 
         public ContextType GetContext(int order)

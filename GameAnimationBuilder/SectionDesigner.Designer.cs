@@ -31,7 +31,10 @@
             this.comboBox_Class = new System.Windows.Forms.ComboBox();
             this.pictureBox_SectionPreview = new System.Windows.Forms.PictureBox();
             this.dataGridView_Objects = new System.Windows.Forms.DataGridView();
+            this.Objects = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridView_Properties = new System.Windows.Forms.DataGridView();
+            this.Property = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Value = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_SectionPreview)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Objects)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Properties)).BeginInit();
@@ -40,11 +43,14 @@
             // comboBox_Class
             // 
             this.comboBox_Class.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox_Class.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_Class.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBox_Class.FormattingEnabled = true;
-            this.comboBox_Class.Location = new System.Drawing.Point(679, 12);
+            this.comboBox_Class.Location = new System.Drawing.Point(625, 12);
             this.comboBox_Class.Name = "comboBox_Class";
-            this.comboBox_Class.Size = new System.Drawing.Size(263, 24);
+            this.comboBox_Class.Size = new System.Drawing.Size(317, 36);
             this.comboBox_Class.TabIndex = 0;
+            this.comboBox_Class.SelectedIndexChanged += new System.EventHandler(this.comboBox_Class_SelectedIndexChanged);
             // 
             // pictureBox_SectionPreview
             // 
@@ -53,7 +59,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox_SectionPreview.Location = new System.Drawing.Point(13, 13);
             this.pictureBox_SectionPreview.Name = "pictureBox_SectionPreview";
-            this.pictureBox_SectionPreview.Size = new System.Drawing.Size(660, 577);
+            this.pictureBox_SectionPreview.Size = new System.Drawing.Size(606, 577);
             this.pictureBox_SectionPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox_SectionPreview.TabIndex = 1;
             this.pictureBox_SectionPreview.TabStop = false;
@@ -62,28 +68,66 @@
             // 
             this.dataGridView_Objects.AllowUserToAddRows = false;
             this.dataGridView_Objects.AllowUserToDeleteRows = false;
+            this.dataGridView_Objects.AllowUserToResizeRows = false;
             this.dataGridView_Objects.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView_Objects.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView_Objects.Location = new System.Drawing.Point(679, 42);
+            this.dataGridView_Objects.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Objects});
+            this.dataGridView_Objects.Location = new System.Drawing.Point(625, 54);
             this.dataGridView_Objects.Name = "dataGridView_Objects";
+            this.dataGridView_Objects.ReadOnly = true;
+            this.dataGridView_Objects.RowHeadersVisible = false;
             this.dataGridView_Objects.RowHeadersWidth = 51;
             this.dataGridView_Objects.RowTemplate.Height = 24;
-            this.dataGridView_Objects.Size = new System.Drawing.Size(263, 183);
+            this.dataGridView_Objects.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridView_Objects.Size = new System.Drawing.Size(317, 171);
             this.dataGridView_Objects.TabIndex = 3;
+            this.dataGridView_Objects.SelectionChanged += new System.EventHandler(this.dataGridView_Objects_SelectionChanged);
+            // 
+            // Objects
+            // 
+            this.Objects.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Objects.HeaderText = "Objects";
+            this.Objects.MinimumWidth = 6;
+            this.Objects.Name = "Objects";
+            this.Objects.ReadOnly = true;
+            this.Objects.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             // 
             // dataGridView_Properties
             // 
             this.dataGridView_Properties.AllowUserToAddRows = false;
             this.dataGridView_Properties.AllowUserToDeleteRows = false;
+            this.dataGridView_Properties.AllowUserToResizeRows = false;
             this.dataGridView_Properties.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView_Properties.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView_Properties.Location = new System.Drawing.Point(679, 231);
+            this.dataGridView_Properties.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Property,
+            this.Value});
+            this.dataGridView_Properties.Location = new System.Drawing.Point(625, 231);
             this.dataGridView_Properties.Name = "dataGridView_Properties";
+            this.dataGridView_Properties.RowHeadersVisible = false;
             this.dataGridView_Properties.RowHeadersWidth = 51;
             this.dataGridView_Properties.RowTemplate.Height = 24;
-            this.dataGridView_Properties.Size = new System.Drawing.Size(263, 359);
+            this.dataGridView_Properties.Size = new System.Drawing.Size(317, 359);
             this.dataGridView_Properties.TabIndex = 4;
+            this.dataGridView_Properties.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_Properties_CellValueChanged);
+            // 
+            // Property
+            // 
+            this.Property.HeaderText = "Property";
+            this.Property.MinimumWidth = 6;
+            this.Property.Name = "Property";
+            this.Property.ReadOnly = true;
+            this.Property.Width = 125;
+            // 
+            // Value
+            // 
+            this.Value.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Value.HeaderText = "Value";
+            this.Value.MinimumWidth = 6;
+            this.Value.Name = "Value";
+            this.Value.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             // 
             // SectionDesigner
             // 
@@ -99,6 +143,7 @@
             this.Name = "SectionDesigner";
             this.Text = "Section Designer";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.SectionDesigner_Paint);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_SectionPreview)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Objects)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Properties)).EndInit();
@@ -112,5 +157,8 @@
         private System.Windows.Forms.PictureBox pictureBox_SectionPreview;
         private System.Windows.Forms.DataGridView dataGridView_Objects;
         private System.Windows.Forms.DataGridView dataGridView_Properties;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Objects;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Property;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Value;
     }
 }

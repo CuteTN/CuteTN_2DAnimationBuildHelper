@@ -958,7 +958,8 @@ namespace GameAnimationBuilder
             if(obj is Section)
             {
                 var section = obj as Section;
-                SectionDesigner sd = new SectionDesigner(section);
+                var animObj = AnimatingObjectsLib.Instance.GetAllItems();
+                SectionDesigner sd = new SectionDesigner(section, animObj);
                 sd.ShowInTaskbar = false;
                 sd.ShowDialog();
             }

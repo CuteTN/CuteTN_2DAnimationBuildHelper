@@ -51,6 +51,18 @@ namespace GameAnimationBuilder
             return UndefinedPos.Count;
         }
 
+        public List<string> GetUndefinedPropertiesNames()
+        {
+            List<string> result = new List<string>();
+
+            foreach(int i in UndefinedPos)
+            {
+                result.Add(Properties[i].Name);
+            }
+
+            return result;
+        }
+
         public ContextType GetContext(int order)
         {
             if(order == 0)
