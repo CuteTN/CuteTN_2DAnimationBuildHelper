@@ -6,6 +6,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
@@ -289,6 +290,45 @@ namespace GameAnimationBuilder
         }
         #endregion
 
+        #region Delete game object
+        private void DeleteSelectedObjects()
+        {
+            List<string> toDelId = new List<string>();
+            List<int> toDelIndex = new List<int>();
+
+            foreach(DataGridViewRow rowObj in dataGridView_Objects.SelectedRows)
+            {
+                toDelId.Add(rowObj.Cells[0].Value as string);
+                toDelIndex.Add(rowObj.Index);
+            }
+
+            // remove from datagridview
+            // remember to delete them backward...
+            toDelIndex.OrderByDescending(i => i);
+            foreach(int index in toDelIndex)
+            { 
+                dataGridView_Objects.Rows.RemoveAt(index);
+            }
+
+            // remove from data
+            foreach (string id in toDelId)
+            {
+                AnimatingObjects.Remove(id);
+            }
+        }
+        
+        private void button_Delete_Click(object sender, EventArgs e)
+        {
+            var dlgRes = MessageBox.Show(null, "Are you sure? (you can't undo this command)", "Delete selected objects", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if(dlgRes == DialogResult.No)
+                return;
+
+            DeleteSelectedObjects();
+            
+            MyUpdate();
+        }
+        #endregion
+
         #region update rendering
 
         /// <summary>
@@ -339,7 +379,15 @@ namespace GameAnimationBuilder
             foreach(DataGridViewRow objRow in dataGridView_Objects.Rows)
             {
                 string objId = objRow.Cells[0].Value as string;
-                CObject obj = AnimatingObjects[objId] as CObject;
+                CObject obj;
+                try
+                {
+                    obj = AnimatingObjects[objId] as CObject;
+                }
+                catch
+                {
+                    continue;
+                }
 
                 DrawVisibleObject(obj, g);
             }
@@ -352,6 +400,5 @@ namespace GameAnimationBuilder
             UpdatePreviewPictureBox();
         }
         #endregion
-
     }
 }

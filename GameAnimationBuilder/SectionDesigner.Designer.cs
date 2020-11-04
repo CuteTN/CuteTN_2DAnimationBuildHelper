@@ -153,6 +153,7 @@
             this.button_Delete.TabIndex = 6;
             this.button_Delete.Text = "Delete";
             this.button_Delete.UseVisualStyleBackColor = true;
+            this.button_Delete.Click += new System.EventHandler(this.button_Delete_Click);
             // 
             // SectionDesigner
             // 
