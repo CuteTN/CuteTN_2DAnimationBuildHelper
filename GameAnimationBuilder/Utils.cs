@@ -43,6 +43,8 @@ namespace GameAnimationBuilder
         public static readonly string SpecialProp_Section = "Section";
         public static readonly string SpecialProp_X = "X";
         public static readonly string SpecialProp_Y = "Y";
+        public static readonly string SpecialProp_Width = "Width";
+        public static readonly string SpecialProp_Height = "Height";
         #endregion
 
         public static readonly string UnknownErrorMsg = "Unknown Error!";

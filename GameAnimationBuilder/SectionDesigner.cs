@@ -11,6 +11,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data;
 
 namespace GameAnimationBuilder
 {
@@ -148,23 +149,31 @@ namespace GameAnimationBuilder
 
             foreach(var propName in propNames)
             {
-                if(dataGridView_Objects.SelectedRows.Count == 1)
+                try
                 { 
-                    dataGridView_Properties.Rows.Add(propName, SelectedObject.GetProperty(propName).EncodedValue);
+                    if(dataGridView_Objects.SelectedRows.Count == 1)
+                    { 
+                        dataGridView_Properties.Rows.Add(propName, SelectedObject.GetProperty(propName).EncodedValue);
+                    }
+                    else
+                    {
+                        // CuteTN Note: buggy buddy
+                        string commonVal = CommonPropertyValue(propName);
+                        if(commonVal == null)
+                            commonVal = Utils.UndefinedValue; 
+                        dataGridView_Properties.Rows.Add(propName, commonVal);
+                    }
                 }
-                else
+                catch
                 {
-                    // CuteTN Note: buggy buddy
-                    string commonVal = CommonPropertyValue(propName);
-                    if(commonVal == null)
-                        commonVal = Utils.UndefinedValue; 
-                    dataGridView_Properties.Rows.Add(propName, commonVal);
+                    MessageBox.Show("Something's gone wrong in LoadPropertiesOfObject!");
                 }
             }
         }
         private void dataGridView_Objects_SelectionChanged(object sender, EventArgs e)
         {
-            MyUpdate();
+            LoadPropertiesOfObject();
+            Invalidate();
         }
         #endregion
 
@@ -175,7 +184,6 @@ namespace GameAnimationBuilder
             LoadPropertiesOfObject();
         }
         #endregion
-
 
 
         #region Update value to data
@@ -199,19 +207,55 @@ namespace GameAnimationBuilder
             }
         }
 
+        /// <summary>
+        /// Evaluate mathematical expression
+        /// </summary>
+        /// <returns>true if the is at least one expression is evaluated</returns>
+        private bool EvaluateIntPropertyCells(int rowIndex, int colIndex)
+        {
+            bool result = false;
+
+            if(colIndex < 1)
+                return result;
+
+            // dont know why but this fixes a bug :)
+            if(rowIndex < 0)
+                return result;
+
+            DataGridViewCell cellPropVal = dataGridView_Properties.Rows[rowIndex].Cells[colIndex]; 
+            DataGridViewCell cellPropName = dataGridView_Properties.Rows[rowIndex].Cells[0]; 
+
+            try
+            { 
+                string propName = cellPropName.Value as string;
+                string propOldVal = cellPropVal.Value as string;
+
+                var prop = SelectedClass.GetProperty(propName);
+                if(prop.Type != ContextType.Int)
+                    return false;
+
+                DataTable dt = new DataTable();
+                var propNewVal = ((int)dt.Compute(propOldVal, "")).ToString();
+
+                if(propOldVal != propNewVal)
+                    result = true;
+                else
+                    return false;
+
+                dataGridView_Properties.Rows[rowIndex].Cells[colIndex].Value = propNewVal;
+            }
+            catch { }
+
+            return result;
+        }
+
         private void dataGridView_Properties_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            bool sthEvaluated = EvaluateIntPropertyCells(e.RowIndex, e.ColumnIndex);
+            if(sthEvaluated)
+                return;
+
             EditChangedValue();
-            MyUpdate();
-        }
-        #endregion
-
-        #region Update
-        private void MyUpdate()
-        {
-            // Do not load object from selected class here :) it would cause circular recursion
-
-            LoadPropertiesOfObject();
             Invalidate();
         }
         #endregion
@@ -281,7 +325,8 @@ namespace GameAnimationBuilder
             AnimatingObjects.Add(id, obj);
 
             LoadObjectsOfSelectedClass();
-            MyUpdate();
+            LoadPropertiesOfObject();
+            Invalidate();
         }
 
         private void button_Add_Click(object sender, EventArgs e)
@@ -304,10 +349,14 @@ namespace GameAnimationBuilder
 
             // remove from datagridview
             // remember to delete them backward...
-            toDelIndex.OrderByDescending(i => i);
-            foreach(int index in toDelIndex)
-            { 
-                dataGridView_Objects.Rows.RemoveAt(index);
+            toDelIndex.Sort((a, b) => b.CompareTo(a));
+            foreach (int index in toDelIndex)
+            {
+                if(index >= 0)
+                {
+                    MessageBox.Show(index.ToString());
+                    dataGridView_Objects.Rows.RemoveAt(index);
+                }
             }
 
             // remove from data
@@ -325,12 +374,12 @@ namespace GameAnimationBuilder
 
             DeleteSelectedObjects();
             
-            MyUpdate();
+            LoadPropertiesOfObject();
+            Invalidate();
         }
         #endregion
 
         #region update rendering
-
         /// <summary>
         /// return true if draw successfully
         /// </summary>
@@ -369,6 +418,118 @@ namespace GameAnimationBuilder
             return true;
         }
 
+        /// <summary>
+        /// Invisible objects only have x, y, width, heightr simply add a rectangle
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="g"></param>
+        /// <returns></returns>
+        private bool DrawInvisibleObject(CObject obj, Graphics g)
+        {
+            int x, y, width, height;
+
+            // don't draw object of another section
+            try
+            {
+                if (obj.GetProperty(Utils.SpecialProp_Section).EncodedValue != Section.StringId)
+                    return false;
+            }
+            catch
+            {
+                return false;
+            }
+
+            try { x = int.Parse(obj.GetProperty(Utils.SpecialProp_X).EncodedValue); }
+            catch { return false; }
+
+            try { y = int.Parse(obj.GetProperty(Utils.SpecialProp_Y).EncodedValue); }
+            catch { return false; }
+
+            try { width = int.Parse(obj.GetProperty(Utils.SpecialProp_Width).EncodedValue); }
+            catch { return false; }
+
+            try { height = int.Parse(obj.GetProperty(Utils.SpecialProp_Height).EncodedValue); }
+            catch { return false; }
+
+            Pen pen = new Pen(Color.Beige, 1);
+            Brush brush = new SolidBrush(Color.FromArgb(50, Color.Beige));
+
+            g.FillRectangle(brush, x, y, width, height);
+            g.DrawRectangle(pen, x, y, width, height);
+
+            return true;
+        }
+
+        private bool HighlightVisibleObject(CObject obj, Graphics g)
+        {
+            int x,y;
+            Bitmap preview;
+
+            try { x = int.Parse(obj.GetProperty(Utils.SpecialProp_X).EncodedValue); }
+            catch { return false;}
+
+            try { y = int.Parse(obj.GetProperty(Utils.SpecialProp_Y).EncodedValue); }
+            catch { return false;}
+
+            try { 
+                var prop = obj.GetProperty(Utils.SpecialProp_Preview);
+                preview = AnimatingObjects[prop.EncodedValue].GetPreviewBitmap();
+            }
+            catch { return false;}
+
+            Pen highlightPen = new Pen(Color.HotPink, 3);
+            g.DrawRectangle(highlightPen, x, y, preview.Width, preview.Height);
+
+            return true;
+        }
+
+        private bool HighlightInvisibleObject(CObject obj, Graphics g)
+        {
+            int x, y, width, height;
+
+            // don't draw object of another section
+            try
+            {
+                if (obj.GetProperty(Utils.SpecialProp_Section).EncodedValue != Section.StringId)
+                    return false;
+            }
+            catch
+            {
+                return false;
+            }
+
+            try { x = int.Parse(obj.GetProperty(Utils.SpecialProp_X).EncodedValue); }
+            catch { return false; }
+
+            try { y = int.Parse(obj.GetProperty(Utils.SpecialProp_Y).EncodedValue); }
+            catch { return false; }
+
+            try { width = int.Parse(obj.GetProperty(Utils.SpecialProp_Width).EncodedValue); }
+            catch { return false; }
+
+            try { height = int.Parse(obj.GetProperty(Utils.SpecialProp_Height).EncodedValue); }
+            catch { return false; }
+
+            Pen highlightPen = new Pen(Color.HotPink, 3);
+            g.DrawRectangle(highlightPen, x, y, width, height);
+
+            return true;
+        }
+
+        private bool HighlightSelectedObjects(Graphics g)
+        {
+            foreach(DataGridViewRow rowObj in dataGridView_Objects.SelectedRows)
+            {
+                var objId = rowObj.Cells[0].Value as string;
+                var obj = AnimatingObjects[objId] as CObject;
+
+                HighlightVisibleObject(obj, g);
+                HighlightInvisibleObject(obj, g);
+            }
+
+            return true;
+        }
+
         private void UpdatePreviewPictureBox()
         {
             Texture background = AnimatingObjects[Section.TextureId] as Texture;
@@ -376,6 +537,7 @@ namespace GameAnimationBuilder
 
             Graphics g = Graphics.FromImage(PreviewBitmap);
 
+            // draw every game object
             foreach(DataGridViewRow objRow in dataGridView_Objects.Rows)
             {
                 string objId = objRow.Cells[0].Value as string;
@@ -390,7 +552,11 @@ namespace GameAnimationBuilder
                 }
 
                 DrawVisibleObject(obj, g);
+                DrawInvisibleObject(obj, g);
             }
+
+            // highlight selected ones
+            HighlightSelectedObjects(g);
 
             pictureBox_SectionPreview.Image = PreviewBitmap;
         }
