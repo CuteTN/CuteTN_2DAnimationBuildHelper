@@ -37,6 +37,7 @@
             this.Value = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.button_Add = new System.Windows.Forms.Button();
             this.button_Delete = new System.Windows.Forms.Button();
+            this.button_Save = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_SectionPreview)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Objects)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Properties)).BeginInit();
@@ -155,12 +156,25 @@
             this.button_Delete.UseVisualStyleBackColor = true;
             this.button_Delete.Click += new System.EventHandler(this.button_Delete_Click);
             // 
+            // button_Save
+            // 
+            this.button_Save.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_Save.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.button_Save.Location = new System.Drawing.Point(699, 231);
+            this.button_Save.Name = "button_Save";
+            this.button_Save.Size = new System.Drawing.Size(77, 33);
+            this.button_Save.TabIndex = 7;
+            this.button_Save.Text = "Save";
+            this.button_Save.UseVisualStyleBackColor = true;
+            this.button_Save.Click += new System.EventHandler(this.button_Save_Click);
+            // 
             // SectionDesigner
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkSlateBlue;
             this.ClientSize = new System.Drawing.Size(954, 602);
+            this.Controls.Add(this.button_Save);
             this.Controls.Add(this.button_Delete);
             this.Controls.Add(this.button_Add);
             this.Controls.Add(this.dataGridView_Properties);
@@ -190,5 +204,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Value;
         private System.Windows.Forms.Button button_Add;
         private System.Windows.Forms.Button button_Delete;
+        private System.Windows.Forms.Button button_Save;
     }
 }
