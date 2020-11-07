@@ -65,9 +65,9 @@ namespace GameAnimationBuilder
                     _tags.Add("OBJECT_ANIMATIONS");
                     _tags.Add("COLLISION_BOX_GROUP");
                     _tags.Add("IMPORT");
+                    _tags.Add("SECTION");
                     _tags.Add("CLASS");
                     _tags.Add("OBJECT");
-                    _tags.Add("SECTION");
                 }
 
                 return _tags;

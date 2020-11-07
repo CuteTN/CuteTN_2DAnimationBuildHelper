@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GameAnimationBuilder
 {
-    public class CObject : AnimatingObject, IDynamicContext
+    public class CObject : AnimatingObject, IDynamicContext, IAdditionalProperty
     {
         public string ClassId;
 

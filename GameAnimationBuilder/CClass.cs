@@ -17,7 +17,7 @@ namespace GameAnimationBuilder
         AddToLib
         -GetPreviewBitmap
     */
-    public class CClass : AnimatingObject, IDynamicContext, IAdditionalProperty
+    public class CClass : AnimatingObject, IDynamicContext
     {
         private static readonly int parametersOnLine = 4;
 

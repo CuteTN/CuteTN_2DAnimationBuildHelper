@@ -180,6 +180,89 @@ namespace GameAnimationBuilder
             return result;
         }
 
+        private string GenerateInput_Sections()
+        {
+            string result = "[SECTIONS]\n";
+            result += "#SectionId\tBackground\n";
+
+            foreach (var item in data)
+            {
+                if (item.Value is Section)
+                {
+                    Section section = item.Value as Section;
+
+                    int sectionId = intIds[section.StringId];
+                    int bgId = intIds[section.TextureId];
+
+                    result += $"{sectionId}\t\t{bgId}\n";
+                }
+            }
+
+            return result;
+        }
+
+        private string GenerateInput_CClasses()
+        {
+            string result = "[CLASSES]\n";
+            result += "#ClassId\tBackground\n";
+
+            foreach (var item in data)
+            {
+                if (item.Value is CClass)
+                {
+                    CClass cClass = item.Value as CClass;
+
+                    int cClassId = intIds[cClass.StringId];
+
+                    result += $"{cClassId}\n";
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// CuteTN Note: bad code here!
+        /// </summary>
+        /// <returns></returns>
+        private string GenerateInput_CObjects()
+        {
+            string result = "[OBJECT]\n";
+            result += "#ObjId\tClassId\tProperties...\n";
+            
+            foreach(var item in data)
+            {
+                if(item.Value is CObject)
+                { 
+                    CObject obj = item.Value as CObject;
+                    int objId = intIds[obj.StringId];
+                    int cclassId = intIds[obj.ClassId];
+                    
+                    result += $"{objId} {cclassId}\t";
+                    foreach(var prop in obj.Properties)
+                    {
+                        string val = prop.EncodedValue;
+
+                        // CuteTN Note: bad code here, but I don't really care because this class' whole purpose is to adapt to my game :)
+                        if(prop.Type == ContextType.String)
+                            val = Utils.DecodeStringToRaw(prop.EncodedValue);
+                        else if(prop.Type == ContextType.Int)
+                            val = prop.EncodedValue;
+                        else if(prop.Type == ContextType.Bool)
+                            val = Boolean.Parse(prop.EncodedValue)? "1":"0";
+                        else if(intIds.ContainsKey(prop.EncodedValue))
+                            val = intIds[prop.EncodedValue].ToString();
+
+                        result += $"{prop.Name} {val}\t";
+                    }
+
+                    result += "\n";
+                }
+            }
+            
+            return result;
+        }
+
         public string GenerateInput()
         {
             string result = "";
@@ -189,6 +272,9 @@ namespace GameAnimationBuilder
             result += GenerateInput_StateAnimation() + "\n";
             result += GenerateInput_ObjectAnimations() + "\n";
             result += GenerateInput_CollisionBoxes() + "\n";
+            result += GenerateInput_Sections() + "\n";
+            result += GenerateInput_CClasses() + "\n";
+            result += GenerateInput_CObjects() + "\n";
 
             return result;
         }

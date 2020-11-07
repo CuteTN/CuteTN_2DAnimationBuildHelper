@@ -11,7 +11,6 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Data;
 using System.IO;
 
 namespace GameAnimationBuilder
@@ -21,7 +20,8 @@ namespace GameAnimationBuilder
         // the goal is to make this form a separated module, so I'm not gonna use singleton here
         Dictionary<string, AnimatingObject> AnimatingObjects = null;
         Section Section;
-        Bitmap PreviewBitmap;
+        Bitmap PreviewBitmap, SectionBackground;
+        double ScaleRatio = 1;
 
         #region init
         /// <summary>
@@ -67,14 +67,19 @@ namespace GameAnimationBuilder
             InitializeComponent();
         }
 
-        public SectionDesigner(Section section, Dictionary<string, AnimatingObject> animObjs) : this()
+        public SectionDesigner(Section section, Dictionary<string, AnimatingObject> animObjs)
         {
+            InitializeComponent();
             Section = section;
             AnimatingObjects = new Dictionary<string, AnimatingObject>();
 
             // warning: shallow copy
             foreach(var i in animObjs)
                 AnimatingObjects.Add(i.Key, i.Value);
+
+            // ScaleOptimization();
+            Texture backgroundtexture = AnimatingObjects[Section.TextureId] as Texture;
+            SectionBackground = new Bitmap(backgroundtexture.Bitmap);
 
             LoadClassesToCombobox();
             UpdatePreviewPictureBox();
@@ -94,6 +99,19 @@ namespace GameAnimationBuilder
             }
 
             comboBox_Class.SelectedIndex = 0;
+        }
+
+        private void ScaleOptimization()
+        {
+            // get background before scaling
+            Texture backgroundtexture = AnimatingObjects[Section.TextureId] as Texture;
+            var fullSectionBackground = new Bitmap(backgroundtexture.Bitmap);
+
+            ScaleRatio = Math.Min((double)pictureBox_SectionPreview.Size.Width/fullSectionBackground.Width, (double)pictureBox_SectionPreview.Size.Height/fullSectionBackground.Height);
+            int newWidth = (int)Math.Round(fullSectionBackground.Width * ScaleRatio);
+            int newHeight = (int)Math.Round(fullSectionBackground.Height * ScaleRatio);
+
+            SectionBackground = new Bitmap(fullSectionBackground, newWidth, newHeight);
         }
         #endregion
 
@@ -387,6 +405,17 @@ namespace GameAnimationBuilder
         #endregion
 
         #region update rendering
+        private Rectangle ScaleRectangle(int x, int y, int width, int height, double ratio)
+        {
+            Rectangle result = new Rectangle();
+            result.X = (int)Math.Round(x * ratio);
+            result.Y = (int)Math.Round(y * ratio);
+            result.Width = (int)Math.Round(width * ratio);
+            result.Height = (int)Math.Round(height * ratio);
+
+            return result;
+        }
+
         /// <summary>
         /// return true if draw successfully
         /// </summary>
@@ -420,7 +449,7 @@ namespace GameAnimationBuilder
             }
             catch { return false;}
 
-            g.DrawImage(preview, x, y);
+            g.DrawImage(preview, ScaleRectangle(x, y, preview.Width, preview.Height, ScaleRatio));
 
             return true;
         }
@@ -461,8 +490,8 @@ namespace GameAnimationBuilder
             Pen pen = new Pen(Color.Beige, 1);
             Brush brush = new SolidBrush(Color.FromArgb(50, Color.Beige));
 
-            g.FillRectangle(brush, x, y, width, height);
-            g.DrawRectangle(pen, x, y, width, height);
+            g.FillRectangle(brush, ScaleRectangle(x, y, width, height, ScaleRatio));
+            g.DrawRectangle(pen, ScaleRectangle(x, y, width, height, ScaleRatio));
 
             return true;
         }
@@ -485,7 +514,7 @@ namespace GameAnimationBuilder
             catch { return false;}
 
             Pen highlightPen = new Pen(Color.HotPink, 3);
-            g.DrawRectangle(highlightPen, x, y, preview.Width, preview.Height);
+            g.DrawRectangle(highlightPen, ScaleRectangle(x, y, preview.Width, preview.Height, ScaleRatio));
 
             return true;
         }
@@ -518,7 +547,7 @@ namespace GameAnimationBuilder
             catch { return false; }
 
             Pen highlightPen = new Pen(Color.HotPink, 3);
-            g.DrawRectangle(highlightPen, x, y, width, height);
+            g.DrawRectangle(highlightPen, ScaleRectangle(x, y, width, height, ScaleRatio));
 
             return true;
         }
@@ -541,10 +570,10 @@ namespace GameAnimationBuilder
         {
             if(AnimatingObjects == null)
                 return;
-
-            Texture background = AnimatingObjects[Section.TextureId] as Texture;
-            PreviewBitmap = new Bitmap(background.Bitmap);
-
+            if(SectionBackground == null)
+                return;
+            
+            PreviewBitmap = new Bitmap(SectionBackground);
             Graphics g = Graphics.FromImage(PreviewBitmap);
 
             // draw every game object
