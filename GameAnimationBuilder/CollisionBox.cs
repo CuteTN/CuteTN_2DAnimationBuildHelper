@@ -21,7 +21,7 @@ namespace GameAnimationBuilder
         public string SpriteId = "";
         public Rectangle Box = new Rectangle();
 
-        static private Brush brush = new SolidBrush( Color.FromArgb(50, Color.HotPink) );
+        static private Brush brush = new SolidBrush( Color.FromArgb(200, Color.Green) );
         private Bitmap bitmap = null;
 
         public CollisionBox(string id, Sprite sprite, Rectangle box)

@@ -50,7 +50,9 @@ namespace GameAnimationBuilder
             textBox_Code.AcceptsTab = true;
 
             // working directory
-            textBox_WorkingDir.Text = Application.StartupPath;
+            // textBox_WorkingDir.Text = Directory.GetCurrentDirectory();
+            textBox_WorkingDir.Text = "D:\\practice_programming\\nmGame_All\\BlasterMaster_GameDo\\BlasterMasterTemplate_NMPTGame2020\\BlasterMaster";
+
 
             // timer
             timer = new Timer();

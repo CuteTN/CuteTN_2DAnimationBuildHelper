@@ -93,7 +93,8 @@ namespace GameAnimationBuilder
                         var sprite = data[spriteId] as Sprite;
                         int spriteIntId = intIds[sprite.StringId];
 
-                        int duration = anim.Durations[i];
+                        // CuteTN Warning: change the duration when exporting to make this fit to DirectX LOL
+                        int duration = anim.Durations[i] * 10;
 
                         result += $"{spriteIntId}\t\t{duration}\t\t";
                     }
@@ -227,7 +228,7 @@ namespace GameAnimationBuilder
         /// <returns></returns>
         private string GenerateInput_CObjects()
         {
-            string result = "[OBJECT]\n";
+            string result = "[OBJECTS]\n";
             result += "#ObjId\tClassId\tProperties...\n";
             
             foreach(var item in data)

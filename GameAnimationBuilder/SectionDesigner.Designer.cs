@@ -60,12 +60,16 @@
             this.pictureBox_SectionPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox_SectionPreview.Location = new System.Drawing.Point(13, 12);
+            this.pictureBox_SectionPreview.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pictureBox_SectionPreview.Location = new System.Drawing.Point(12, 12);
             this.pictureBox_SectionPreview.Name = "pictureBox_SectionPreview";
-            this.pictureBox_SectionPreview.Size = new System.Drawing.Size(533, 578);
+            this.pictureBox_SectionPreview.Size = new System.Drawing.Size(534, 578);
             this.pictureBox_SectionPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox_SectionPreview.TabIndex = 1;
             this.pictureBox_SectionPreview.TabStop = false;
+            this.pictureBox_SectionPreview.SizeChanged += new System.EventHandler(this.pictureBox_SectionPreview_SizeChanged);
+            this.pictureBox_SectionPreview.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_SectionPreview_MouseDown);
+            this.pictureBox_SectionPreview.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_SectionPreview_MouseUp);
             // 
             // dataGridView_Objects
             // 

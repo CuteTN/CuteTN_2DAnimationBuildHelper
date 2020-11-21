@@ -50,7 +50,7 @@ namespace GameAnimationBuilder
         public static readonly string UnknownErrorMsg = "Unknown Error!";
         public static readonly string BackUpFileName = "ANIMATION_BACKUPFILE.txt";
         public static readonly string GeneratedInputFileName = "InputData.txt";
-        public static readonly string GeneratedCppConstsFileName = "Consts.cpp";
+        public static readonly string GeneratedCppConstsFileName = "Consts.h";
 
         static private List<string> _tags = null;
         static public List<string> Tags

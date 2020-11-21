@@ -221,7 +221,6 @@
             this.textBox_WorkingDir.ForeColor = System.Drawing.Color.Thistle;
             this.textBox_WorkingDir.Location = new System.Drawing.Point(149, 673);
             this.textBox_WorkingDir.Name = "textBox_WorkingDir";
-            this.textBox_WorkingDir.ReadOnly = true;
             this.textBox_WorkingDir.Size = new System.Drawing.Size(649, 30);
             this.textBox_WorkingDir.TabIndex = 13;
             this.textBox_WorkingDir.WordWrap = false;

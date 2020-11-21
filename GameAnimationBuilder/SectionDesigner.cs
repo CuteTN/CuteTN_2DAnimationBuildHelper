@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Drawing.Drawing2D;
 
 namespace GameAnimationBuilder
 {
@@ -22,6 +23,7 @@ namespace GameAnimationBuilder
         Section Section;
         Bitmap PreviewBitmap, SectionBackground;
         double ScaleRatio = 1;
+        Rectangle RenderedRectangle = new Rectangle();
 
         #region init
         /// <summary>
@@ -77,7 +79,6 @@ namespace GameAnimationBuilder
             foreach(var i in animObjs)
                 AnimatingObjects.Add(i.Key, i.Value);
 
-            // ScaleOptimization();
             Texture backgroundtexture = AnimatingObjects[Section.TextureId] as Texture;
             SectionBackground = new Bitmap(backgroundtexture.Bitmap);
 
@@ -101,17 +102,18 @@ namespace GameAnimationBuilder
             comboBox_Class.SelectedIndex = 0;
         }
 
-        private void ScaleOptimization()
+        private void pictureBox_SectionPreview_SizeChanged(object sender, EventArgs e)
         {
-            // get background before scaling
-            Texture backgroundtexture = AnimatingObjects[Section.TextureId] as Texture;
-            var fullSectionBackground = new Bitmap(backgroundtexture.Bitmap);
+            if(SectionBackground == null)
+                return;
 
-            ScaleRatio = Math.Min((double)pictureBox_SectionPreview.Size.Width/fullSectionBackground.Width, (double)pictureBox_SectionPreview.Size.Height/fullSectionBackground.Height);
-            int newWidth = (int)Math.Round(fullSectionBackground.Width * ScaleRatio);
-            int newHeight = (int)Math.Round(fullSectionBackground.Height * ScaleRatio);
+            ScaleRatio = Math.Min((double)pictureBox_SectionPreview.Size.Width / SectionBackground.Width, (double)pictureBox_SectionPreview.Size.Height / SectionBackground.Height);
 
-            SectionBackground = new Bitmap(fullSectionBackground, newWidth, newHeight);
+            RenderedRectangle.Width = (int)Math.Round(SectionBackground.Width * ScaleRatio);
+            RenderedRectangle.Height = (int)Math.Round(SectionBackground.Height * ScaleRatio);
+
+            RenderedRectangle.X = (pictureBox_SectionPreview.Width - RenderedRectangle.Width) / 2;
+            RenderedRectangle.Y = (pictureBox_SectionPreview.Height - RenderedRectangle.Height) / 2;
         }
         #endregion
 
@@ -318,7 +320,7 @@ namespace GameAnimationBuilder
         private void AddNewObject(int? idNumber = null)
         {
             int idNum = 0; 
-            string classId = SelectedClass.StringId;
+            string classId = $"{Section.StringId}_{SelectedClass.StringId}";
 
             if (idNumber == null)
                 idNum = AutoGenerateIdNumber(classId, CombinePrefixNumber);
@@ -449,7 +451,7 @@ namespace GameAnimationBuilder
             }
             catch { return false;}
 
-            g.DrawImage(preview, ScaleRectangle(x, y, preview.Width, preview.Height, ScaleRatio));
+            g.DrawImage(preview, ScaleRectangle(x, y, preview.Width, preview.Height, 1));
 
             return true;
         }
@@ -488,10 +490,12 @@ namespace GameAnimationBuilder
             catch { return false; }
 
             Pen pen = new Pen(Color.Beige, 1);
-            Brush brush = new SolidBrush(Color.FromArgb(50, Color.Beige));
+            // Brush brush = new SolidBrush(Color.FromArgb(50, Color.Beige));
 
-            g.FillRectangle(brush, ScaleRectangle(x, y, width, height, ScaleRatio));
-            g.DrawRectangle(pen, ScaleRectangle(x, y, width, height, ScaleRatio));
+            Brush brush = new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(50, Color.Beige), Color.FromArgb(200, Color.Black));
+
+            g.FillRectangle(brush, ScaleRectangle(x, y, width, height, 1));
+            g.DrawRectangle(pen, ScaleRectangle(x, y, width, height, 1));
 
             return true;
         }
@@ -514,7 +518,7 @@ namespace GameAnimationBuilder
             catch { return false;}
 
             Pen highlightPen = new Pen(Color.HotPink, 3);
-            g.DrawRectangle(highlightPen, ScaleRectangle(x, y, preview.Width, preview.Height, ScaleRatio));
+            g.DrawRectangle(highlightPen, ScaleRectangle(x, y, preview.Width, preview.Height, 1));
 
             return true;
         }
@@ -547,7 +551,7 @@ namespace GameAnimationBuilder
             catch { return false; }
 
             Pen highlightPen = new Pen(Color.HotPink, 3);
-            g.DrawRectangle(highlightPen, ScaleRectangle(x, y, width, height, ScaleRatio));
+            g.DrawRectangle(highlightPen, ScaleRectangle(x, y, width, height, 1));
 
             return true;
         }
@@ -621,6 +625,17 @@ namespace GameAnimationBuilder
                     string scope = $"OBJECT\r\n";
 
                     CObject obj = pair.Value as CObject;
+
+                    try
+                    { 
+                        if(obj.GetProperty(Utils.SpecialProp_Section).EncodedValue != Section.StringId)
+                            continue;
+                    }
+                    catch 
+                    { 
+                        continue;
+                    }
+
                     CClass cclass = AnimatingObjects[obj.ClassId] as CClass;
 
                     scope += $"\t{obj.StringId}\r\n";
@@ -657,6 +672,31 @@ namespace GameAnimationBuilder
             sr.Write(GenerateCode());
             sr.Close();
             sr.Dispose();
+        }
+        #endregion
+
+        #region drag and drop
+        private Point TileAt(int x, int y)
+        {
+            int selectedCol = (int)Math.Round(x / ScaleRatio / 16);
+            int selectedRow = (int)Math.Round(y / ScaleRatio / 16);
+            Point result = new Point(selectedCol, selectedRow);
+
+            return result;
+        }
+
+        private void pictureBox_SectionPreview_MouseDown(object sender, MouseEventArgs e)
+        {
+            // e.X and e.Y: position relative to the picture box
+            Point tile = TileAt(e.X - RenderedRectangle.X, e.Y - RenderedRectangle.Y);
+
+            MessageBox.Show($"{tile}");
+        }
+
+
+
+        private void pictureBox_SectionPreview_MouseUp(object sender, MouseEventArgs e)
+        {
         }
         #endregion
     }

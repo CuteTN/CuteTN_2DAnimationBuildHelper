@@ -16,6 +16,7 @@ namespace GameAnimationBuilder
             AddToLib
             -GetPreviewBitmap
         */
+        public string ObjectAnimationsId;
         public string AnimationId;
         public bool FlipX;
         public bool FlipY;
