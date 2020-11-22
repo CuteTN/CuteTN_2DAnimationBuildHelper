@@ -38,6 +38,7 @@
             this.button_Add = new System.Windows.Forms.Button();
             this.button_Delete = new System.Windows.Forms.Button();
             this.button_Save = new System.Windows.Forms.Button();
+            this.checkBox_SelectionMode = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_SectionPreview)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Objects)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Properties)).BeginInit();
@@ -60,15 +61,15 @@
             this.pictureBox_SectionPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox_SectionPreview.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.pictureBox_SectionPreview.Location = new System.Drawing.Point(12, 12);
             this.pictureBox_SectionPreview.Name = "pictureBox_SectionPreview";
-            this.pictureBox_SectionPreview.Size = new System.Drawing.Size(534, 578);
+            this.pictureBox_SectionPreview.Size = new System.Drawing.Size(534, 551);
             this.pictureBox_SectionPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox_SectionPreview.TabIndex = 1;
             this.pictureBox_SectionPreview.TabStop = false;
             this.pictureBox_SectionPreview.SizeChanged += new System.EventHandler(this.pictureBox_SectionPreview_SizeChanged);
             this.pictureBox_SectionPreview.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_SectionPreview_MouseDown);
+            this.pictureBox_SectionPreview.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_SectionPreview_MouseMove);
             this.pictureBox_SectionPreview.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_SectionPreview_MouseUp);
             // 
             // dataGridView_Objects
@@ -172,12 +173,24 @@
             this.button_Save.UseVisualStyleBackColor = true;
             this.button_Save.Click += new System.EventHandler(this.button_Save_Click);
             // 
+            // checkBox_SelectionMode
+            // 
+            this.checkBox_SelectionMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.checkBox_SelectionMode.AutoSize = true;
+            this.checkBox_SelectionMode.Location = new System.Drawing.Point(13, 569);
+            this.checkBox_SelectionMode.Name = "checkBox_SelectionMode";
+            this.checkBox_SelectionMode.Size = new System.Drawing.Size(127, 21);
+            this.checkBox_SelectionMode.TabIndex = 8;
+            this.checkBox_SelectionMode.Text = "Selection Mode";
+            this.checkBox_SelectionMode.UseVisualStyleBackColor = true;
+            // 
             // SectionDesigner
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkSlateBlue;
             this.ClientSize = new System.Drawing.Size(954, 602);
+            this.Controls.Add(this.checkBox_SelectionMode);
             this.Controls.Add(this.button_Save);
             this.Controls.Add(this.button_Delete);
             this.Controls.Add(this.button_Add);
@@ -194,6 +207,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Objects)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Properties)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -209,5 +223,6 @@
         private System.Windows.Forms.Button button_Add;
         private System.Windows.Forms.Button button_Delete;
         private System.Windows.Forms.Button button_Save;
+        private System.Windows.Forms.CheckBox checkBox_SelectionMode;
     }
 }

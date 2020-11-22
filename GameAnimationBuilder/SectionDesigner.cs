@@ -24,6 +24,9 @@ namespace GameAnimationBuilder
         Bitmap PreviewBitmap, SectionBackground;
         double ScaleRatio = 1;
         Rectangle RenderedRectangle = new Rectangle();
+        int NumberOfTileRows, NumberOfTileCols;
+
+        Point LeftMouseDownLocation, RightMouseDownLocation;
 
         #region init
         /// <summary>
@@ -81,6 +84,9 @@ namespace GameAnimationBuilder
 
             Texture backgroundtexture = AnimatingObjects[Section.TextureId] as Texture;
             SectionBackground = new Bitmap(backgroundtexture.Bitmap);
+
+            NumberOfTileCols = SectionBackground.Width / 16;
+            NumberOfTileCols = SectionBackground.Height / 16;
 
             LoadClassesToCombobox();
             UpdatePreviewPictureBox();
@@ -352,6 +358,15 @@ namespace GameAnimationBuilder
             AnimatingObjects.Add(id, obj);
 
             LoadObjectsOfSelectedClass();
+
+            // select the just-created object
+            foreach(DataGridViewRow row in dataGridView_Objects.Rows)
+            {
+                row.Selected = false;
+                if(row.Cells[0].Value.ToString() == id)
+                    row.Selected = true;
+            }
+
             LoadPropertiesOfObject();
             UpdatePreviewPictureBox();
         }
@@ -381,7 +396,6 @@ namespace GameAnimationBuilder
             {
                 if(index >= 0)
                 {
-                    MessageBox.Show(index.ToString());
                     dataGridView_Objects.Rows.RemoveAt(index);
                 }
             }
@@ -500,58 +514,41 @@ namespace GameAnimationBuilder
             return true;
         }
 
-        private bool HighlightVisibleObject(CObject obj, Graphics g)
+        private Rectangle CalcBoundingRect(CObject obj)
         {
-            int x,y;
+            int x, y, width, height;
             Bitmap preview;
 
             try { x = int.Parse(obj.GetProperty(Utils.SpecialProp_X).EncodedValue); }
-            catch { return false;}
+            catch { return new Rectangle(); }
 
             try { y = int.Parse(obj.GetProperty(Utils.SpecialProp_Y).EncodedValue); }
-            catch { return false;}
+            catch { return  new Rectangle(); }
 
-            try { 
-                var prop = obj.GetProperty(Utils.SpecialProp_Preview);
-                preview = AnimatingObjects[prop.EncodedValue].GetPreviewBitmap();
-            }
-            catch { return false;}
-
-            Pen highlightPen = new Pen(Color.HotPink, 3);
-            g.DrawRectangle(highlightPen, ScaleRectangle(x, y, preview.Width, preview.Height, 1));
-
-            return true;
-        }
-
-        private bool HighlightInvisibleObject(CObject obj, Graphics g)
-        {
-            int x, y, width, height;
-
-            // don't draw object of another section
             try
             {
-                if (obj.GetProperty(Utils.SpecialProp_Section).EncodedValue != Section.StringId)
-                    return false;
+                var prop = obj.GetProperty(Utils.SpecialProp_Preview);
+                preview = AnimatingObjects[prop.EncodedValue].GetPreviewBitmap();
+                width = preview.Width;
+                height = preview.Height;
             }
-            catch
+            catch 
             {
-                return false;
+                try { width = int.Parse(obj.GetProperty(Utils.SpecialProp_Width).EncodedValue); }
+                catch { return new Rectangle(); }
+
+                try { height = int.Parse(obj.GetProperty(Utils.SpecialProp_Height).EncodedValue); }
+                catch { return new Rectangle(); }
             }
 
-            try { x = int.Parse(obj.GetProperty(Utils.SpecialProp_X).EncodedValue); }
-            catch { return false; }
+            return new Rectangle(x, y, width, height);
+        }
 
-            try { y = int.Parse(obj.GetProperty(Utils.SpecialProp_Y).EncodedValue); }
-            catch { return false; }
-
-            try { width = int.Parse(obj.GetProperty(Utils.SpecialProp_Width).EncodedValue); }
-            catch { return false; }
-
-            try { height = int.Parse(obj.GetProperty(Utils.SpecialProp_Height).EncodedValue); }
-            catch { return false; }
-
+        private bool HighlightObject(CObject obj, Graphics g)
+        {
+            Rectangle boundRect = CalcBoundingRect(obj);
             Pen highlightPen = new Pen(Color.HotPink, 3);
-            g.DrawRectangle(highlightPen, ScaleRectangle(x, y, width, height, 1));
+            g.DrawRectangle(highlightPen, boundRect);
 
             return true;
         }
@@ -563,8 +560,7 @@ namespace GameAnimationBuilder
                 var objId = rowObj.Cells[0].Value as string;
                 var obj = AnimatingObjects[objId] as CObject;
 
-                HighlightVisibleObject(obj, g);
-                HighlightInvisibleObject(obj, g);
+                HighlightObject(obj, g);
             }
 
             return true;
@@ -676,28 +672,105 @@ namespace GameAnimationBuilder
         #endregion
 
         #region drag and drop
-        private Point TileAt(int x, int y)
+        private Rectangle CalcRectOnPicture(Point pointOnPicBox1, Point pointOnPicBox2)
         {
-            int selectedCol = (int)Math.Round(x / ScaleRatio / 16);
-            int selectedRow = (int)Math.Round(y / ScaleRatio / 16);
-            Point result = new Point(selectedCol, selectedRow);
+            Rectangle result = new Rectangle();
+
+            result.X = Math.Min(pointOnPicBox1.X, pointOnPicBox2.X);
+            result.Y = Math.Min(pointOnPicBox1.Y, pointOnPicBox2.Y);
+
+            // translate because it the picture is centered
+            result.X -= RenderedRectangle.X;
+            result.Y -= RenderedRectangle.Y;
+
+            result.Width = Math.Abs(pointOnPicBox1.X - pointOnPicBox2.X);
+            result.Height = Math.Abs(pointOnPicBox1.Y - pointOnPicBox2.Y);
+            result = ScaleRectangle(result.X, result.Y, result.Width, result.Height, 1/ScaleRatio);
 
             return result;
         }
 
-        private void pictureBox_SectionPreview_MouseDown(object sender, MouseEventArgs e)
+        private Rectangle SnapToTileGrid(Rectangle rectOnPicture)
         {
-            // e.X and e.Y: position relative to the picture box
-            Point tile = TileAt(e.X - RenderedRectangle.X, e.Y - RenderedRectangle.Y);
+            Rectangle result = new Rectangle();
 
-            MessageBox.Show($"{tile}");
+            // floor function but in magic way
+            result.X = (rectOnPicture.X / 16) * 16;
+            result.Y = (rectOnPicture.Y / 16) * 16;
+
+            // ceil function but in magic way
+            int right  = ((rectOnPicture.Right  + 15) / 16) * 16;
+            int bottom = ((rectOnPicture.Bottom + 15) / 16) * 16;
+
+            result.Width  = right  - result.X;
+            result.Height = bottom - result.Y;
+
+            return result;
         }
 
+        private Point TileAt(int x, int y)
+        {
+            int col = (int)Math.Round(x / ScaleRatio / 16);
+            int row = (int)Math.Round(y / ScaleRatio / 16);
+            Point result = new Point(col, row);
 
+            return result;
+        }
+
+        private void ApplyDragDropEdit(Point mouseDownLocation, Point mouseUpLocation)
+        {
+            if(SelectedObject == null)
+                return;
+
+            // rect On pic on init
+            Rectangle rect = CalcRectOnPicture(mouseDownLocation, mouseUpLocation);
+
+            // snap to grid
+            rect = SnapToTileGrid(rect);
+
+            try
+            { 
+                SelectedObject.SetProperty(Utils.SpecialProp_X, rect.X.ToString());
+                SelectedObject.SetProperty(Utils.SpecialProp_Y, rect.Y.ToString());
+            }
+            catch { }
+
+            try
+            {
+                SelectedObject.SetProperty(Utils.SpecialProp_Width , rect.Width .ToString());
+                SelectedObject.SetProperty(Utils.SpecialProp_Height, rect.Height.ToString());
+            }
+            catch { }
+
+            LoadPropertiesOfObject();
+            UpdatePreviewPictureBox();
+        }
+
+        private void pictureBox_SectionPreview_MouseDown(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Left)
+            {
+                LeftMouseDownLocation = e.Location;
+            }
+
+            if(e.Button == MouseButtons.Right)
+            {
+                RightMouseDownLocation = e.Location;
+            }
+        }
 
         private void pictureBox_SectionPreview_MouseUp(object sender, MouseEventArgs e)
         {
         }
+
+        private void pictureBox_SectionPreview_MouseMove(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Left)
+            { 
+                ApplyDragDropEdit(LeftMouseDownLocation, e.Location);
+            }
+        }
+
         #endregion
     }
 }
