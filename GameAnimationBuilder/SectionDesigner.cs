@@ -82,7 +82,7 @@ namespace GameAnimationBuilder
             foreach(var i in animObjs)
                 AnimatingObjects.Add(i.Key, i.Value);
 
-            Texture backgroundtexture = AnimatingObjects[Section.TextureId] as Texture;
+            Texture backgroundtexture = AnimatingObjects[Section.BackgroundId] as Texture;
             SectionBackground = new Bitmap(backgroundtexture.Bitmap);
 
             NumberOfTileCols = SectionBackground.Width / 16;
@@ -133,7 +133,8 @@ namespace GameAnimationBuilder
                 { 
                     var obj = i.Value as CObject;
 
-                    if(obj.ClassId == SelectedClass.StringId)
+                    string objSectionId = obj.GetProperty(Utils.SpecialProp_Section).EncodedValue;
+                    if (obj.ClassId == SelectedClass.StringId && Section.StringId == objSectionId)
                         dataGridView_Objects.Rows.Add(obj.StringId);
                 }
         }
@@ -208,6 +209,7 @@ namespace GameAnimationBuilder
         private void comboBox_Class_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadObjectsOfSelectedClass();
+            UpdatePreviewPictureBox();
             LoadPropertiesOfObject();
         }
         #endregion
@@ -746,6 +748,8 @@ namespace GameAnimationBuilder
             UpdatePreviewPictureBox();
         }
 
+
+
         private void pictureBox_SectionPreview_MouseDown(object sender, MouseEventArgs e)
         {
             if(e.Button == MouseButtons.Left)
@@ -766,11 +770,57 @@ namespace GameAnimationBuilder
         private void pictureBox_SectionPreview_MouseMove(object sender, MouseEventArgs e)
         {
             if(e.Button == MouseButtons.Left)
-            { 
-                ApplyDragDropEdit(LeftMouseDownLocation, e.Location);
-            }
+                if((Control.ModifierKeys & Keys.Control) != 0)
+                { 
+                    ApplyDragDropEdit(LeftMouseDownLocation, e.Location);
+                }
         }
 
+        #endregion
+
+        #region Filter bitmap from background (making foreground)
+        private Bitmap GetFilteredBitmap()
+        {
+            Utilities.DirectBitmap result = new Utilities.DirectBitmap(SectionBackground.Width, SectionBackground.Height);
+            for(int x=0; x<result.Width; x++)
+                for(int y=0; y<result.Height; y++)
+                    result.SetPixel(x, y, Color.FromArgb(0,0,0,0));
+
+            dataGridView_Objects.Rows.Clear();
+
+            foreach (var i in AnimatingObjects)
+                if (i.Value is CObject)
+                {
+                    var obj = i.Value as CObject;
+
+                    if (obj.ClassId == SelectedClass.StringId)
+                    {
+                        var rect = CalcBoundingRect(obj);
+                        
+                        for(int x=rect.Left; x<=rect.Right-1; x++)
+                            for(int y=rect.Top; y<=rect.Bottom-1; y++)
+                                try { result.SetPixel(x, y, SectionBackground.GetPixel(x,y)); }
+                                catch { }
+                    }
+
+                }
+
+            return result.Bitmap;
+        }
+
+        private void button_FilterBitmap_Click(object sender, EventArgs e)
+        {
+            var dlg = new SaveFileDialog();
+            dlg.DefaultExt = "png";
+            var dlgRes = dlg.ShowDialog();
+
+            if (dlgRes == DialogResult.OK)
+            {
+                Bitmap result = GetFilteredBitmap();
+                result.Save(dlg.FileName);
+            }
+
+        }
         #endregion
     }
 }

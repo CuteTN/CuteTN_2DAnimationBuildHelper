@@ -12,12 +12,12 @@ namespace GameAnimationBuilder
         Dictionary<string, AnimatingObject> data;
         Dictionary<string, int> intIds;
 
-        public CppCodeGenerator(Dictionary<string, AnimatingObject> data)
+        public CppCodeGenerator(Dictionary<string, AnimatingObject> data, int startIndex = 0)
         {
             this.data = data;
             intIds = new Dictionary<string, int>();
 
-            int intId = 0;
+            int intId = startIndex;
             foreach(var item in data)
             {
                 intIds.Add(item.Key, intId);
@@ -184,7 +184,7 @@ namespace GameAnimationBuilder
         private string GenerateInput_Sections()
         {
             string result = "[SECTIONS]\n";
-            result += "#SectionId\tBackground\n";
+            result += "#SectionId\tBackground\tForeground\n";
 
             foreach (var item in data)
             {
@@ -193,9 +193,10 @@ namespace GameAnimationBuilder
                     Section section = item.Value as Section;
 
                     int sectionId = intIds[section.StringId];
-                    int bgId = intIds[section.TextureId];
+                    int bgId = intIds[section.BackgroundId];
+                    int fgId = intIds[section.ForegroundId];
 
-                    result += $"{sectionId}\t\t{bgId}\n";
+                    result += $"{sectionId}\t\t{bgId}\t\t{fgId}\n";
                 }
             }
 
@@ -205,7 +206,7 @@ namespace GameAnimationBuilder
         private string GenerateInput_CClasses()
         {
             string result = "[CLASSES]\n";
-            result += "#ClassId\tBackground\n";
+            result += "#ClassId\n";
 
             foreach (var item in data)
             {

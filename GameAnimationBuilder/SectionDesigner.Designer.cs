@@ -39,6 +39,7 @@
             this.button_Delete = new System.Windows.Forms.Button();
             this.button_Save = new System.Windows.Forms.Button();
             this.checkBox_SelectionMode = new System.Windows.Forms.CheckBox();
+            this.button_FilterBitmap = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_SectionPreview)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Objects)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_Properties)).BeginInit();
@@ -184,12 +185,25 @@
             this.checkBox_SelectionMode.Text = "Selection Mode";
             this.checkBox_SelectionMode.UseVisualStyleBackColor = true;
             // 
+            // button_FilterBitmap
+            // 
+            this.button_FilterBitmap.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_FilterBitmap.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.button_FilterBitmap.Location = new System.Drawing.Point(552, 231);
+            this.button_FilterBitmap.Name = "button_FilterBitmap";
+            this.button_FilterBitmap.Size = new System.Drawing.Size(141, 33);
+            this.button_FilterBitmap.TabIndex = 9;
+            this.button_FilterBitmap.Text = "Filter Bitmap";
+            this.button_FilterBitmap.UseVisualStyleBackColor = true;
+            this.button_FilterBitmap.Click += new System.EventHandler(this.button_FilterBitmap_Click);
+            // 
             // SectionDesigner
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkSlateBlue;
             this.ClientSize = new System.Drawing.Size(954, 602);
+            this.Controls.Add(this.button_FilterBitmap);
             this.Controls.Add(this.checkBox_SelectionMode);
             this.Controls.Add(this.button_Save);
             this.Controls.Add(this.button_Delete);
@@ -224,5 +238,6 @@
         private System.Windows.Forms.Button button_Delete;
         private System.Windows.Forms.Button button_Save;
         private System.Windows.Forms.CheckBox checkBox_SelectionMode;
+        private System.Windows.Forms.Button button_FilterBitmap;
     }
 }

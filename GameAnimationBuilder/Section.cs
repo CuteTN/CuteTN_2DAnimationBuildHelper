@@ -9,7 +9,7 @@ namespace GameAnimationBuilder
 {
     public class Section : AnimatingObject, IScriptable
     {
-        public string TextureId;
+        public string BackgroundId, ForegroundId;
 
         public ContextType GetContext(int order)
         {
@@ -20,6 +20,9 @@ namespace GameAnimationBuilder
                 return ContextType.Id;
 
             if(order == 2)
+                return ContextType.Texture;
+
+            if(order == 3)
                 return ContextType.Texture;
 
             return ContextType.Unknown;
@@ -36,6 +39,9 @@ namespace GameAnimationBuilder
             if(order == 2)
                 return $"Background: The background image for the section, this also gives the section the rendering size";
 
+            if(order == 2)
+                return $"Foreground: The foreground image for the section";
+
             return "";
         }
 
@@ -44,29 +50,35 @@ namespace GameAnimationBuilder
             string result = "";
             result += "SECTION\r\n"
                     + "\tSectionId\r\n"
-                    + "\tBackground\r\n";
+                    + "\tBackground\r\n"
+                    + "\tForeground\r\n";
 
             return result;
         }
 
         public string ParseData(List<string> codeWords)
         {
-            if(codeWords.Count != 3)
+            if(codeWords.Count != 4)
                 return $"Please follow this snippet: \n{GetSnippet()}";
 
             StringId = codeWords[1];
 
-            TextureId = codeWords[2];
-            var texture = AnimatingObjectsLib.Instance.Get(TextureId) as Texture;
+            BackgroundId = codeWords[2];
+            var texture = AnimatingObjectsLib.Instance.Get(BackgroundId) as Texture;
             if(texture == null)
-                return $"Texture Id {TextureId} is not found";
+                return $"Texture Id {BackgroundId} is not found";
+
+            ForegroundId = codeWords[3];
+            texture = AnimatingObjectsLib.Instance.Get(ForegroundId) as Texture;
+            if (texture == null)
+                return $"Texture Id {ForegroundId} is not found";
 
             return "";
         }
 
         public override Bitmap GetPreviewBitmap(int time = 0)
         {
-            var texture = AnimatingObjectsLib.Instance.Get(TextureId) as Texture;
+            var texture = AnimatingObjectsLib.Instance.Get(BackgroundId) as Texture;
             return texture.GetPreviewBitmap(time);
         }
     }

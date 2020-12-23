@@ -51,7 +51,7 @@ namespace GameAnimationBuilder
 
             // working directory
             // textBox_WorkingDir.Text = Directory.GetCurrentDirectory();
-            textBox_WorkingDir.Text = "D:\\practice_programming\\nmGame_All\\BlasterMaster_GameDo\\BlasterMasterTemplate_NMPTGame2020\\BlasterMaster";
+            textBox_WorkingDir.Text = "C:\\Users\\quant\\Desktop\\BlasterMasterAnim";
 
 
             // timer
@@ -80,6 +80,10 @@ namespace GameAnimationBuilder
             if (TimeElapsed % 100 == 0)
             {
                 SaveBackUp();
+            }
+
+            if (TimeElapsed % 10 == 0)
+            {
                 RefreshSuggestionsList();
             }
 
@@ -272,7 +276,8 @@ namespace GameAnimationBuilder
 
             if(dlgRes == DialogResult.OK)
             {
-                CppCodeGenerator codeGenerator = new CppCodeGenerator(AnimatingObjectsLib.Instance.GetAllItems());
+                int startIndex = (int)numericUpDown_StartIndex.Value;
+                CppCodeGenerator codeGenerator = new CppCodeGenerator(AnimatingObjectsLib.Instance.GetAllItems(), startIndex);
 
                 string inputData = codeGenerator.GenerateInput();
                 string cppConsts = codeGenerator.GenerateCppConsts();
@@ -964,8 +969,13 @@ namespace GameAnimationBuilder
                 var section = obj as Section;
                 var animObj = AnimatingObjectsLib.Instance.GetAllItems();
                 SectionDesigner sd = new SectionDesigner(section, animObj);
-                sd.ShowInTaskbar = false;
-                sd.ShowDialog();
+
+                try
+                { 
+                    sd.ShowInTaskbar = false;
+                    sd.ShowDialog();
+                }
+                catch { }
             }
         }
         #endregion

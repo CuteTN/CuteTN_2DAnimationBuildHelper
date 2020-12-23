@@ -46,7 +46,9 @@
             this.label_WorkingDir = new System.Windows.Forms.Label();
             this.button_BackUp = new System.Windows.Forms.Button();
             this.button_Designer = new System.Windows.Forms.Button();
+            this.numericUpDown_StartIndex = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Preview)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_StartIndex)).BeginInit();
             this.SuspendLayout();
             // 
             // textBox_Code
@@ -154,7 +156,7 @@
             // button_Tricks
             // 
             this.button_Tricks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_Tricks.Location = new System.Drawing.Point(945, 673);
+            this.button_Tricks.Location = new System.Drawing.Point(945, 601);
             this.button_Tricks.Name = "button_Tricks";
             this.button_Tricks.Size = new System.Drawing.Size(104, 30);
             this.button_Tricks.TabIndex = 8;
@@ -271,12 +273,31 @@
             this.button_Designer.UseVisualStyleBackColor = true;
             this.button_Designer.Click += new System.EventHandler(this.button_Designer_Click);
             // 
+            // numericUpDown_StartIndex
+            // 
+            this.numericUpDown_StartIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.numericUpDown_StartIndex.Location = new System.Drawing.Point(945, 673);
+            this.numericUpDown_StartIndex.Maximum = new decimal(new int[] {
+            100000000,
+            0,
+            0,
+            0});
+            this.numericUpDown_StartIndex.Name = "numericUpDown_StartIndex";
+            this.numericUpDown_StartIndex.Size = new System.Drawing.Size(104, 23);
+            this.numericUpDown_StartIndex.TabIndex = 18;
+            this.numericUpDown_StartIndex.Value = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkSlateBlue;
             this.ClientSize = new System.Drawing.Size(1385, 714);
+            this.Controls.Add(this.numericUpDown_StartIndex);
             this.Controls.Add(this.button_Designer);
             this.Controls.Add(this.button_BackUp);
             this.Controls.Add(this.label_WorkingDir);
@@ -303,6 +324,7 @@
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.FormMain_Paint);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_Preview)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_StartIndex)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -328,6 +350,7 @@
         private System.Windows.Forms.Label label_WorkingDir;
         private System.Windows.Forms.Button button_BackUp;
         private System.Windows.Forms.Button button_Designer;
+        private System.Windows.Forms.NumericUpDown numericUpDown_StartIndex;
     }
 }
 

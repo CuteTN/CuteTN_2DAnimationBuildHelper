@@ -9,7 +9,7 @@ using Utilities;
 
 namespace GameAnimationBuilder
 {
-    public class Sprite : AnimatingObject
+    public class Sprite : AnimatingObject, IAdditionalProperty
     {
         /*
             GetContext
